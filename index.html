@@ -175,7 +175,15 @@
                 </div>
             </div>
         </section>
-
+<div class="card" style="margin-bottom: 20px;">
+    <h3 style="margin-bottom: 12px; color: var(--pastel-blue-dark); display: flex; align-items: center; gap: 8px;">
+        📸 Hoạt Động Lớp Học
+    </h3>
+    <div id="gallery-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <!-- Ảnh sẽ tự load từ Firebase ở đây -->
+        <p>Đang tải hình ảnh hoạt động...</p>
+    </div>
+</div>
         <!-- 2. MÀN HÌNH XEM BÁO CÁO HỌC SINH -->
         <main id="report-view" class="hidden">
             <div class="report-header-card">
@@ -431,6 +439,10 @@
                                 </thead>
                                 <tbody id="class-manage-tbody"></tbody>
                             </table>
+                            <div class="card" style="margin-top: 20px;">
+    <h3 style="margin-bottom: 12px; color: var(--pastel-blue-dark);">🖼️ Cập Nhật Ảnh Hoạt Động Chung Cho Cả Lớp</h3>
+    <textarea id="admin-gallery-urls" class="form-control" placeholder="Dán các link ảnh vào đây, cách nhau bằng dấu phẩy (,)..." style="width: 100%; height: 80px; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1;"></textarea>
+    <button class="btn-primary" style="margin-top: 10px; padding: 8px 16px;" onclick="saveGallery()">Lưu Bộ Ảnh Mới</button>
                         </div>
 
                         <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
@@ -552,7 +564,20 @@
                     if (data.classList) classList = data.classList;
                     if (data.classDatesMap) classDatesMap = data.classDatesMap;
                     if (data.studentsData) studentsData = data.studentsData;
-                } else {
+                } else {if (data.class_gallery) {
+                const container = document.getElementById('gallery-container');
+                if (container) {
+                    const images = data.class_gallery;
+                    if (images.length > 0) {
+                        container.innerHTML = images.map(url => 
+                            `<img src="${url}" style="width:100%; height:200px; object-fit:cover; border-radius:12px; border: 2px solid #e2e8f0;">`
+                        ).join('');
+                    } else {
+                        container.innerHTML = `<p style="padding:10px;">Chưa có hình ảnh hoạt động chung.</p>`;
+                    }
+                }
+            }
+        }
                     // Nếu trên cloud chưa có dữ liệu, khởi tạo bản mẫu lên cloud
                     saveData();
                 }
