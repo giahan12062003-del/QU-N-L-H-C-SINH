@@ -2,170 +2,1224 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Học Sinh</title>
-    <!-- Tailwind CSS & Google Fonts -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hệ Thống Quản Lý Học Sinh & Điểm Kiểm Tra</title>
+    <!-- Firebase SDK (Version 9 Compatibility) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
     <style>
-        body { font-family: 'Lexend', sans-serif; }
+        :root {
+            --bg-cream: #faf8f5;
+            --pastel-blue: #e0f2fe;
+            --pastel-blue-dark: #0284c7;
+            --pastel-pink: #fce7f3;
+            --pastel-pink-dark: #db2777;
+            --pastel-purple: #f3e8ff;
+            --pastel-purple-dark: #7e22ce;
+            --pastel-yellow: #fef9c3;
+            --pastel-yellow-dark: #ca8a04;
+            --pastel-green: #dcfce7;
+            --pastel-green-dark: #15803d;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+            --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --font-main: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
+        body {
+            background-color: var(--bg-cream);
+            background-image: radial-gradient(#e2e8f0 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container { width: 100%; max-width: 1100px; margin: 0 auto; }
+        .app-header { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
+        .logo-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .logo-icon { font-size: 1.8rem; background: var(--pastel-yellow); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; }
+        .logo-text { font-size: 1.25rem; font-weight: 800; color: var(--pastel-blue-dark); }
+        .logo-subtext { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; }
+
+        /* Login Card */
+        .login-card {
+            background: var(--card-bg); border-radius: var(--border-radius); padding: 36px 24px;
+            box-shadow: var(--shadow-soft); text-align: center; margin: 20px auto; max-width: 460px;
+            border: 1px solid #e2e8f0; position: relative; overflow: hidden;
+        }
+        .login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, #38bdf8, #f472b6, #c084fc, #facc15); }
+        .input-group { margin-bottom: 18px; text-align: left; }
+        .input-label { display: block; font-weight: 700; font-size: 0.88rem; margin-bottom: 6px; }
+        .text-input { width: 100%; padding: 12px 16px; border: 2px solid #cbd5e1; border-radius: 12px; font-size: 0.95rem; outline: none; }
+        .text-input:focus { border-color: #0284c7; }
+        
+        .btn-primary { padding: 12px 18px; background: #0284c7; color: white; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 700; cursor: pointer; }
+        .btn-success { padding: 8px 12px; background: #10b981; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+        .btn-danger { padding: 10px 14px; background: #ef4444; color: white; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+        .btn-warning { padding: 8px 12px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8rem; }
+        .btn-secondary { padding: 10px 18px; background: #ffffff; color: var(--text-main); border: 1px solid #cbd5e1; border-radius: 12px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+        .btn-ai { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); color: white; border: none; padding: 8px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+        
+        .error-message { background: #fef2f2; color: #dc2626; padding: 12px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; border: 1px solid #fecaca; display: none; }
+
+        /* Report Header & Cards */
+        .report-header-card { 
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
+            border-radius: var(--border-radius); 
+            padding: 20px 24px; 
+            margin-bottom: 20px; 
+            border: 1px solid #bae6fd;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        }
+        .student-info h2 { font-size: 1.75rem; color: #0369a1; margin-bottom: 8px; }
+        .meta-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag { background: #ffffff; padding: 6px 12px; border-radius: 16px; font-size: 0.82rem; font-weight: 700; color: #0284c7; border: 1px solid #bae6fd; }
+
+        .date-selector-box {
+            background: #ffffff; padding: 8px 14px; border-radius: 12px; border: 1.5px solid #0284c7;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .date-selector-box label { font-size: 0.85rem; font-weight: 700; color: #0369a1; }
+        .date-input { border: none; outline: none; background: transparent; font-size: 0.95rem; font-weight: 700; color: #1e293b; cursor: pointer; }
+
+        .grid-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 18px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; }
+        .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; }
+        .card-icon { font-size: 1.2rem; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+        .icon-blue { background: var(--pastel-blue); } .icon-pink { background: var(--pastel-pink); } .icon-purple { background: var(--pastel-purple); } .icon-yellow { background: var(--pastel-yellow); }
+        
+        .score-box { display: flex; align-items: baseline; gap: 4px; margin-bottom: 4px; }
+        .score-value { font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+        .score-max { font-size: 0.9rem; color: var(--text-muted); font-weight: 700; }
+        .card-avg { background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border: 2px solid #facc15; }
+
+        /* Admin Panels & Tables */
+        .admin-panel { background: #ffffff; border-radius: var(--border-radius); padding: 24px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; }
+        .tab-bar { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 18px; border-radius: 10px; font-weight: 700; font-size: 0.9rem; background: transparent; border: none; cursor: pointer; color: #64748b; }
+        .tab-btn.active { background: var(--pastel-purple); color: var(--pastel-purple-dark); }
+        
+        .table-wrapper { width: 100%; overflow-x: auto; margin-bottom: 20px; border: 1px solid #e2e8f0; border-radius: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; min-width: 750px; }
+        th, td { padding: 10px 12px; text-align: center; border: 1px solid #e2e8f0; }
+        th { background: #f8fafc; color: #475569; font-weight: 700; }
+
+        .badge { padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; display: inline-block; cursor: pointer; }
+        .badge-success { background: var(--pastel-green); color: var(--pastel-green-dark); }
+        .badge-warning { background: var(--pastel-yellow); color: var(--pastel-yellow-dark); }
+        .badge-danger { background: var(--pastel-pink); color: var(--pastel-pink-dark); }
+
+        .class-filter-bar { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+
+        .comment-bank { margin-bottom: 12px; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; background: #f8fafc; }
+        .chip-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .chip { background: #ffffff; border: 1px solid #cbd5e1; padding: 5px 10px; border-radius: 16px; font-size: 0.8rem; cursor: pointer; }
+        .chip:hover { background: var(--pastel-purple); border-color: var(--pastel-purple-dark); color: var(--pastel-purple-dark); }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group label { font-size: 0.85rem; font-weight: 700; color: #475569; }
+        .form-control { padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.9rem; outline: none; }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+
+        .hidden { display: none !important; }
+        @media (max-width: 900px) { .grid-cards { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .grid-cards { grid-template-columns: 1fr; } .report-header-card { flex-direction: column; align-items: flex-start; } }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body>
 
-    <!-- HEADER -->
-    <header class="bg-white border-b border-slate-200 py-4 px-6 text-center shadow-sm sticky top-0 z-50">
-        <div class="flex items-center justify-center gap-3">
-            <span class="text-3xl">🎓</span>
+    <header class="app-header">
+        <div class="logo-area" onclick="showLogin()">
+            <div class="logo-icon">🎓</div>
             <div>
-                <h1 class="text-xl font-bold text-sky-600">Hệ Thống Quản Lý Học Sinh</h1>
-                <p class="text-xs text-slate-400 font-medium">Student Management System</p>
+                <div class="logo-text">Hệ Thống Quản Lý Học Sinh</div>
+                <div class="logo-subtext">Student Management System</div>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto p-4 md:p-6">
+    <div class="container">
 
-        <!-- 1. MÀN HÌNH DÀNH CHO PHỤ HUYNH (MẶC ĐỊNH) -->
-        <section id="parentView" class="space-y-6">
-            <!-- Tra cứu Form -->
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 max-w-md mx-auto text-center space-y-4">
-                <div class="text-4xl">📖</div>
-                <h2 class="text-lg font-bold text-slate-700">Quản Lý Điểm Danh & Học Tập</h2>
-                <p class="text-xs text-slate-400">Nhập tên Học sinh và chọn Lớp để xem thông tin.</p>
-                
-                <div class="space-y-3 text-left">
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 block mb-1">Chọn Lớp Học</label>
-                        <select id="classSelect" class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
-                            <option value="Pre-Starters">Pre-Starters</option>
-                            <option value="Starters">Starters</option>
-                            <option value="Movers">Movers</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 block mb-1">Họ và Tên Học Sinh</label>
-                        <input type="text" id="studentNameInput" placeholder="Ví dụ: Mia, Elsa..." class="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
-                    </div>
-                    <button onclick="searchStudent()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3 rounded-xl transition-all shadow-md shadow-sky-100 flex items-center justify-center gap-2 text-sm">
-                        <span>Xem Báo Cáo & Lịch Học</span> ➔
-                    </button>
-                </div>
-            </div>
+        <!-- 1. MÀN HÌNH TRA CỨU HỌC SINH -->
+        <section id="login-view">
+            <div class="login-card">
+                <div style="font-size: 3rem; margin-bottom: 12px;">📖</div>
+                <h1 style="font-size: 1.5rem; margin-bottom: 6px;">Quản Lý Điểm Danh & Học Tập</h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">Nhập tên Học sinh và chọn Lớp để xem thông tin.</p>
 
-            <!-- KẾT QUẢ BÁO CÁO (Ẩn mặc định, hiện khi tìm kiếm) -->
-            <div id="reportCard" class="hidden space-y-6">
-                <!-- Info Header -->
-                <div class="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-center justify-between">
-                    <div>
-                        <h2 id="displayStudentName" class="text-2xl font-bold text-sky-700">Mia</h2>
-                        <span id="displayClassName" class="inline-block bg-white text-sky-600 text-xs px-2.5 py-1 rounded-full border border-sky-200 font-medium mt-1">Lớp: Pre-Starters</span>
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label class="input-label" for="login-class-select">Chọn Lớp Học</label>
+                        <select id="login-class-select" class="text-input" style="background:#fff;"></select>
                     </div>
-                    <div class="text-right">
-                        <span class="text-xs text-slate-400 block mb-1">Lọc theo Tháng/Năm</span>
-                        <input type="month" value="2026-08" class="border border-slate-200 rounded-lg p-1.5 text-xs bg-white">
+
+                    <div class="input-group">
+                        <label class="input-label" for="student-name-input">Họ và Tên Học Sinh</label>
+                        <input type="text" id="student-name-input" class="text-input" placeholder="Ví dụ: Mia, Elsa..." required autocomplete="off">
                     </div>
+                    <button type="submit" class="btn-primary" style="width:100%;">Xem Báo Cáo & Lịch Học →</button>
+                </form>
+
+                <div id="login-error" class="error-message">
+                    Không tìm thấy học sinh trong lớp đã chọn!
                 </div>
 
-                <!-- 🌟 TÍNH NĂNG MỚI: HÌNH ẢNH & VIDEO BUỔI HỌC -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                    <h3 class="font-bold text-slate-700 flex items-center gap-2 text-sm">
-                        <span>📸</span> Hình Ảnh & Video Hoạt Động Trong Lớp
-                    </h3>
-                    
-                    <!-- Grid hiển thị ảnh -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="photoGallery">
-                        <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&q=80&w=400" class="rounded-xl object-cover h-32 w-full border border-slate-100 shadow-sm hover:opacity-90 cursor-pointer" alt="Hoạt động lớp">
-                        <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=400" class="rounded-xl object-cover h-32 w-full border border-slate-100 shadow-sm hover:opacity-90 cursor-pointer" alt="Hoạt động lớp">
-                    </div>
-
-                    <!-- Khung phát Video -->
-                    <div class="mt-3">
-                        <p class="text-xs font-semibold text-slate-500 mb-2">🎥 Video thực hành giao tiếp của bé:</p>
-                        <div class="aspect-video w-full rounded-xl overflow-hidden bg-black/5 border border-slate-200">
-                            <iframe class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video lớp học" frameborder="0" allowfullscreen></iframe>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Điểm danh & Điểm số -->
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                    <h3 class="font-bold text-slate-700 text-sm">📊 Kết Quả Kiểm Tra Chi Tiết</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-center">
-                            <span class="text-xs text-amber-700 block font-medium">Điểm Trung Bình</span>
-                            <span class="text-xl font-bold text-amber-600">9.5 / 10</span>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl text-center">
-                            <span class="text-xs text-slate-500 block">Kỹ Năng Nghe</span>
-                            <span class="text-lg font-bold text-slate-700">10 / 10</span>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl text-center">
-                            <span class="text-xs text-slate-500 block">Đọc & Viết</span>
-                            <span class="text-lg font-bold text-slate-700">9.4 / 10</span>
-                        </div>
-                        <div class="bg-slate-50 p-3 rounded-xl text-center">
-                            <span class="text-xs text-slate-500 block">Kỹ Năng Nói</span>
-                            <span class="text-lg font-bold text-slate-700">9.2 / 10</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Nút chuyển sang Admin -->
-            <div class="text-center pt-4">
-                <button onclick="toggleAdminView()" class="text-xs text-slate-400 hover:text-sky-600 underline">
-                    👨‍🏫 Đăng Nhập Giáo Viên (Admin)
-                </button>
-            </div>
-        </section>
-
-        <!-- 2. MÀN HÌNH DÀNH CHO GIÁO VIÊN (ADMIN - ĐỂ TẢI ẢNH/VIDEO) -->
-        <section id="adminView" class="hidden space-y-6">
-            <div class="flex items-center justify-between bg-amber-50 border border-amber-200 p-4 rounded-2xl">
-                <h2 class="font-bold text-amber-800">🛠️ Trang Quản Lý Giáo Viên</h2>
-                <button onclick="toggleAdminView()" class="text-xs bg-white text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200">
-                    ← Quay lại trang Phụ huynh
-                </button>
-            </div>
-
-            <!-- Form Upload Media mới -->
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                <h3 class="font-bold text-slate-700 text-sm border-b pb-2">📸 Đăng Ảnh & Video Buổi Học</h3>
-                
-                <div class="space-y-3">
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 block mb-1">Đường Link Video (YouTube / Drive Embed Link):</label>
-                        <input type="text" id="videoUrlInput" placeholder="https://www.youtube.com/embed/..." class="w-full p-2 border border-slate-200 rounded-lg text-xs">
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600 block mb-1">Tải Ảnh Buổi Học Lên (Có thể chọn nhiều ảnh):</label>
-                        <input type="file" multiple accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100">
-                    </div>
-                    <button class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-xl text-xs shadow-sm">
-                        💾 Lưu & Cập Nhật Lên Hệ Thống
-                    </button>
+                <div style="margin-top: 24px; border-top: 1px dashed #cbd5e1; padding-top: 16px;">
+                    <button class="btn-secondary" style="width: 100%;" onclick="promptAdminLogin()">👩‍🏫 Đăng Nhập Giáo Viên (Admin)</button>
                 </div>
             </div>
         </section>
 
-    </main>
+        <!-- 2. MÀN HÌNH XEM BÁO CÁO HỌC SINH -->
+        <main id="report-view" class="hidden">
+            <div class="report-header-card">
+                <div class="student-info">
+                    <h2 id="display-student-name">Nguyễn Minh Anh</h2>
+                    <div class="meta-tags">
+                        <span class="tag" id="display-class">Lớp: Pre-Starters</span>
+                    </div>
+                </div>
+
+                <div class="date-selector-box">
+                    <label for="report-month-picker">📅 Lọc theo Tháng/Năm:</label>
+                    <input type="month" id="report-month-picker" class="date-input" onchange="onStudentMonthChange(this.value)">
+                </div>
+            </div>
+
+            <!-- NỘI DUNG LỊCH ĐIỂM DANH HỌC SINH -->
+            <div class="card" style="margin-bottom: 20px;">
+                <h3 style="margin-bottom: 12px; color: var(--pastel-blue-dark); display: flex; align-items: center; gap: 8px;">
+                    🗓️ Lịch Sử Điểm Danh & BTVN Trong Tháng (<span id="display-selected-month">08/2026</span>)
+                </h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ngày Học</th>
+                                <th>Buổi Học</th>
+                                <th>Điểm Danh</th>
+                                <th>Bài Tập Về Nhà</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-attendance-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ĐIỂM KIỂM TRA -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                <h3 style="color: #334155;">📊 Kết Quả Kiểm Tra Chi Tiết</h3>
+                <div id="student-exam-selector-box"></div>
+            </div>
+            
+            <div class="grid-cards">
+                <div class="card card-avg">
+                    <div class="card-header">
+                        <div class="card-icon icon-yellow">⭐</div>
+                        <div>
+                            <h3 style="font-size: 0.95rem; color: #854d0e;">Điểm Trung Bình</h3>
+                            <span style="font-size: 0.75rem; color: #a16207; font-weight:bold;">Overall Score</span>
+                        </div>
+                    </div>
+                    <div class="score-box"><span class="score-value" id="avg-score" style="color: #854d0e;">-</span><span class="score-max" style="color: #a16207;">/ 10</span></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-blue">🎧</div>
+                        <div>
+                            <h3 style="font-size: 0.95rem;">Kỹ Năng Nghe</h3>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Listening</span>
+                        </div>
+                    </div>
+                    <div class="score-box"><span class="score-value" id="lis-score">-</span><span class="score-max">/ 10</span></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-pink">📖</div>
+                        <div>
+                            <h3 style="font-size: 0.95rem;">Đọc & Viết</h3>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Reading & Writing</span>
+                        </div>
+                    </div>
+                    <div class="score-box"><span class="score-value" id="rw-score">-</span><span class="score-max">/ 10</span></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-purple">🗣️</div>
+                        <div>
+                            <h3 style="font-size: 0.95rem;">Kỹ Năng Nói</h3>
+                            <span style="font-size: 0.75rem; color: var(--text-muted);">Speaking</span>
+                        </div>
+                    </div>
+                    <div class="score-box"><span class="score-value" id="spk-score">-</span><span class="score-max">/ 10</span></div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 20px; border-left: 5px solid var(--pastel-purple-dark);">
+                <h3 style="margin-bottom: 8px;">💬 Nhận Xét Chi Tiết Của Giáo Viên</h3>
+                <p id="teacher-main-comment" style="line-height: 1.6; color: #334155;">Chưa có nhận xét.</p>
+            </div>
+
+            <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px;">
+                <button class="btn-secondary" onclick="window.print()">🖨️ In Báo Cáo / Lưu PDF</button>
+                <button class="btn-secondary" onclick="showLogin()">↩️ Đăng Xuất</button>
+            </div>
+        </main>
+
+        <!-- 3. QUẢN LÝ ADMIN GIÁO VIÊN -->
+        <section id="admin-view" class="hidden">
+            <div class="admin-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h2 style="color: var(--pastel-purple-dark);">👩‍🏫 Quản Lý Điểm Danh & Kiểm Tra</h2>
+                    <button class="btn-secondary" onclick="showLogin()">Thoát Admin</button>
+                </div>
+
+                <div class="tab-bar">
+                    <button class="tab-btn active" id="tab-btn-att" onclick="switchAdminTab('attendance')">1. Quản Lý Điểm Danh Theo Ngày Lịch</button>
+                    <button class="tab-btn" id="tab-btn-scores" onclick="switchAdminTab('scores')">2. Điểm Kiểm Tra & Nhận Xét</button>
+                    <button class="tab-btn" id="tab-btn-students" onclick="switchAdminTab('students')">3. Quản Lý Danh Sách Lớp</button>
+                </div>
+
+                <!-- BỘ LỌC TÌM THEO LỚP HỌC -->
+                <div class="class-filter-bar">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label style="font-weight: 700; color: var(--pastel-blue-dark); font-size: 0.95rem;">🏫 Lớp Học:</label>
+                        <select id="admin-class-filter" class="form-control" style="font-weight: 700; min-width: 180px; border-color: #0284c7;" onchange="onAdminFilterChange()"></select>
+                    </div>
+
+                    <div style="font-size:0.85rem; color:var(--text-muted);">
+                        💡 Chọn bài test ở mục Thao Tác hoặc thêm bài mới bên dưới.
+                    </div>
+                </div>
+
+                <!-- TAB 1: ĐIỂM DANH THEO LỊCH CỤ THỂ -->
+                <div id="admin-tab-att">
+                    <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-weight: 700; color: #7e22ce;">🗓️ Chọn Ngày Học Lớp Này:</label>
+                            <input type="date" id="admin-date-picker" class="form-control" style="font-weight: 700; border-color: #7e22ce;">
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-primary" onclick="addNewClassDate()">➕ Tạo Thêm Buổi Học Theo Ngày</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr id="att-table-header">
+                                    <th>STT</th>
+                                    <th>Họ và Tên Học Sinh</th>
+                                </tr>
+                            </thead>
+                            <tbody id="att-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 2: QUẢN LÝ ĐIỂM -->
+                <div id="admin-tab-scores" class="hidden">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Họ và Tên</th>
+                                    <th>Lớp</th>
+                                    <th>Tên Bài Kiểm Tra</th>
+                                    <th>Ngày Kiểm Tra</th>
+                                    <th>Nghe</th>
+                                    <th>Đọc & Viết</th>
+                                    <th>Nói</th>
+                                    <th>ĐIỂM TB</th>
+                                    <th>Thao Tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scores-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <h3 style="margin: 20px 0 12px 0;" id="form-title">✏️ Cập Nhật Điểm Kiểm Tra & Nhận Xét</h3>
+                    <form id="score-form" onsubmit="handleSaveScores(event)">
+                        <input type="hidden" id="form-student-id">
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Họ và Tên *</label>
+                                <input type="text" id="form-name" class="form-control" required placeholder="Nguyễn Minh Anh">
+                            </div>
+                            <div class="form-group">
+                                <label>Lớp Học *</label>
+                                <select id="form-class" class="form-control"></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ngày Làm Bài Kiểm Tra *</label>
+                                <input type="date" id="form-exam-date" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Tên Bài Kiểm Tra *</label>
+                                <input type="text" id="form-exam-name" class="form-control" required placeholder="Ví dụ: Unit 1 Test, Unit 2 Test...">
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Điểm Nghe (0-10)</label>
+                                <input type="number" step="0.1" id="form-score-lis" class="form-control" value="8.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Điểm Đọc & Viết (0-10)</label>
+                                <input type="number" step="0.1" id="form-score-rw" class="form-control" value="8.0">
+                            </div>
+                            <div class="form-group">
+                                <label>Điểm Nói (0-10)</label>
+                                <input type="number" step="0.1" id="form-score-spk" class="form-control" value="8.5">
+                            </div>
+                        </div>
+
+                        <div class="comment-bank">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label style="font-size: 0.9rem; font-weight: 700; color: var(--pastel-purple-dark);">✨ Nhận Xét Quick-Tags:</label>
+                                <button type="button" class="btn-ai" onclick="generateAIComment()">🤖 AI Gợi Ý Nhận Xét Tự Nhiên</button>
+                            </div>
+                            
+                            <div class="chip-group">
+                                <span class="chip" onclick="appendComment('Phát âm chuẩn, tự nhiên và ngữ điệu rất tốt.')">+ Phát âm tốt</span>
+                                <span class="chip" onclick="appendComment('Nắm vững từ vựng Unit và áp dụng tốt ngữ pháp.')">+ Từ vựng/Ngữ pháp tốt</span>
+                                <span class="chip" onclick="appendComment('Rất tích cực giơ tay phát biểu trong giờ.')">+ Tích cực phát biểu</span>
+                                <span class="chip" onclick="appendComment('Cần lưu ý ôn tập lại từ vựng cũ bài trước.')">+ Ôn lại từ vựng</span>
+                                <span class="chip" onclick="appendComment('Cần tập trung hơn, tránh làm việc riêng trong lớp.')">+ Cần tập trung</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label>Nội Dung Nhận Xét Chi Tiết:</label>
+                            <textarea id="form-main-comment" class="form-control" placeholder="Bấm nút AI Gợi Ý để tạo nhận xét ấm áp, gần gũi..."></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button type="submit" class="btn-primary" style="flex: 1;">💾 Lưu Bài Kiểm Tra</button>
+                            <button type="button" class="btn-secondary" onclick="resetScoreForm()">Làm Mới / Hủy</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- TAB 3: QUẢN LÝ HỌC SINH VÀ LỚP -->
+                <div id="admin-tab-students" class="hidden">
+                    <div class="card" style="margin-bottom: 24px; border-left: 5px solid var(--pastel-blue-dark);">
+                        <h3 style="margin-bottom: 12px; color: var(--pastel-blue-dark);">🏫 Quản Lý Danh Sách Các Lớp Học</h3>
+                        
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tên Lớp Hiện Tại</th>
+                                        <th>Số Học Sinh</th>
+                                        <th>Thao Tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="class-manage-tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 10px; align-items: center;">
+                            <input type="text" id="new-class-input" class="form-control" placeholder="Nhập tên lớp mới..." style="max-width: 320px;">
+                            <button class="btn-primary" onclick="addNewClass()">➕ Thêm Lớp Mới</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                        <h3>📋 Học Sinh Trong Lớp (<span id="current-class-title" style="color:var(--pastel-purple-dark);">Pre-Starters</span>)</h3>
+                        <button class="btn-danger" onclick="clearAllData()">🗑️ Xóa Sạch Dữ Liệu Tùy Chọn</button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Họ và Tên Học Sinh</th>
+                                    <th>Lớp Học</th>
+                                    <th>Thao Tác Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-list-tbody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="card" style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 12px; color: var(--pastel-blue-dark);">➕ Thêm Học Sinh Mới</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Họ và Tên Học Sinh mới *</label>
+                                <input type="text" id="new-student-name" class="form-control" placeholder="Nhập tên học sinh...">
+                            </div>
+                            <div class="form-group">
+                                <label>Thêm vào Lớp *</label>
+                                <select id="new-student-class" class="form-control"></select>
+                            </div>
+                        </div>
+                        <button class="btn-primary" onclick="addNewStudent()">➕ Thêm Học Sinh</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
 
     <script>
-        function searchStudent() {
-            const name = document.getElementById('studentNameInput').value;
-            if(name) {
-                document.getElementById('displayStudentName').innerText = name;
-                document.getElementById('reportCard').classList.remove('hidden');
-            } else {
-                alert('Vui lòng nhập tên học sinh!');
+        // --- 1. CẤU HÌNH FIREBASE REALTIME DATABASE THẬT CỦA CÔ GIA HAN ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCwU4RcKdEUxarn90pdrin4XVo1DeXRmEc",
+            authDomain: "student-mangenent.firebaseapp.com",
+            databaseURL: "https://student-mangenent-default-rtdb.firebaseio.com",
+            projectId: "student-mangenent",
+            storageBucket: "student-mangenent.firebasestorage.app",
+            messagingSenderId: "556588294302",
+            appId: "1:556588294302:web:b58d38d5a9a054f4219b8f",
+            measurementId: "G-W9NN8ZFN26"
+        };
+
+        // Khởi tạo Firebase Realtime Database
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        const ADMIN_PASSWORD = "hanna126";
+        const DEFAULT_CLASSES = ["Pre-Starters", "Starters", "Movers"];
+
+        const DEFAULT_CLASS_DATES = {
+            "Pre-Starters": ["2026-08-01", "2026-08-08", "2026-08-15"],
+            "Starters": ["2026-08-02", "2026-08-09"],
+            "Movers": ["2026-08-03", "2026-08-10"]
+        };
+
+        const DEFAULT_DATA = [
+            { 
+                id: "1", 
+                name: "Mia", 
+                className: "Pre-Starters", 
+                selectedExamIdx: 0,
+                examReports: [
+                    {
+                        examName: "Unit 1 Test",
+                        date: "2026-08-09",
+                        skills: { lis: 10, rw: 9.4, spk: 9.2 },
+                        mainComment: "Mia làm bài thi rất ấn tượng! Con tự tin và hoàn thành xuất sắc các phần thi."
+                    }
+                ], 
+                attendanceByDate: {} 
+            },
+            { id: "2", name: "Elsa", className: "Pre-Starters", selectedExamIdx: 0, examReports: [], attendanceByDate: {} },
+            { id: "3", name: "Kevin", className: "Pre-Starters", selectedExamIdx: 0, examReports: [], attendanceByDate: {} },
+            { id: "4", name: "Ruby", className: "Pre-Starters", selectedExamIdx: 0, examReports: [], attendanceByDate: {} },
+            { id: "5", name: "Kent", className: "Pre-Starters", selectedExamIdx: 0, examReports: [], attendanceByDate: {} }
+        ];
+
+        let classList = DEFAULT_CLASSES;
+        let classDatesMap = DEFAULT_CLASS_DATES;
+        let studentsData = DEFAULT_DATA;
+        let editingExamIndex = -1;
+
+        // --- 2. ĐỒNG BỘ DỮ LIỆU LÊN ĐÁM MÂY (FIREBASE REALTIME DATABASE) ---
+        function saveData() {
+            // Lưu dữ liệu trực tiếp lên Firebase Cloud
+            db.ref('app_data').set({
+                classList: classList,
+                classDatesMap: classDatesMap,
+                studentsData: studentsData
+            });
+        }
+
+        // Tự động lắng nghe & tải dữ liệu thời gian thực từ Firebase
+        function initFirebaseListener() {
+            db.ref('app_data').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.classList) classList = data.classList;
+                    if (data.classDatesMap) classDatesMap = data.classDatesMap;
+                    if (data.studentsData) studentsData = data.studentsData;
+                } else {
+                    // Nếu trên cloud chưa có dữ liệu, khởi tạo bản mẫu lên cloud
+                    saveData();
+                }
+                populateDropdowns();
+                if (!document.getElementById('admin-view').classList.contains('hidden')) {
+                    renderAdminViews();
+                } else if (!document.getElementById('report-view').classList.contains('hidden') && currentStudent) {
+                    const updated = studentsData.find(s => s.id === currentStudent.id);
+                    if (updated) currentStudent = updated;
+                    renderStudentReport();
+                }
+            });
+        }
+
+        function getClassDates(className) {
+            if (!classDatesMap[className]) {
+                const today = new Date().toISOString().split('T')[0];
+                classDatesMap[className] = [today];
+                saveData();
+            }
+            return classDatesMap[className];
+        }
+
+        function populateDropdowns() {
+            const classDropdowns = ['login-class-select', 'admin-class-filter', 'form-class', 'new-student-class'];
+            classDropdowns.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const currentVal = el.value;
+                el.innerHTML = classList.map(c => `<option value="${c}">${c}</option>`).join('');
+                if (classList.includes(currentVal)) el.value = currentVal;
+            });
+        }
+
+        let currentStudent = null;
+        let selectedStudentMonth = "2026-08";
+
+        function formatDateVN(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            return dateStr;
+        }
+
+        function calcAverage(skills) {
+            if (!skills) return 0;
+            const lis = parseFloat(skills.lis) || 0;
+            const rw = parseFloat(skills.rw) || 0;
+            const spk = parseFloat(skills.spk) || 0;
+            return ((lis + rw + spk) / 3).toFixed(1);
+        }
+
+        function promptAdminLogin() {
+            const pass = prompt("Nhập mật khẩu Giáo viên:");
+            if (pass === ADMIN_PASSWORD) {
+                showAdmin();
+            } else if (pass !== null) {
+                alert("Mật khẩu không chính xác!");
             }
         }
 
-        function toggleAdminView() {
-            document.getElementById('parentView').classList.toggle('hidden');
-            document.getElementById('adminView').classList.toggle('hidden');
+        function showLogin() {
+            populateDropdowns();
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('report-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+            document.getElementById('login-error').style.display = 'none';
         }
+
+        function showReport() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('report-view').classList.remove('hidden');
+            document.getElementById('admin-view').classList.add('hidden');
+            
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            selectedStudentMonth = `${yyyy}-${mm}`;
+            document.getElementById('report-month-picker').value = selectedStudentMonth;
+
+            renderStudentReport();
+        }
+
+        function showAdmin() {
+            populateDropdowns();
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('report-view').classList.add('hidden');
+            document.getElementById('admin-view').classList.remove('hidden');
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('admin-date-picker').value = today;
+            document.getElementById('form-exam-date').value = today;
+
+            renderAdminViews();
+        }
+
+        function onAdminFilterChange() {
+            renderAdminViews();
+        }
+
+        function renderAdminViews() {
+            renderClassManageTable();
+            renderAdminAttTable();
+            renderAdminScoresTable();
+            renderStudentManageTable();
+        }
+
+        // TRA CỨU HỌC SINH
+        function handleLogin(e) {
+            e.preventDefault();
+            const selectedClass = document.getElementById('login-class-select').value;
+            const inputName = document.getElementById('student-name-input').value.trim().toLowerCase();
+            
+            const found = studentsData.find(s => 
+                s.className === selectedClass && 
+                (s.name.toLowerCase() === inputName || s.name.toLowerCase().includes(inputName))
+            );
+
+            if (found) {
+                currentStudent = found;
+                showReport();
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+
+        function onStudentMonthChange(monthVal) {
+            selectedStudentMonth = monthVal;
+            renderStudentReport();
+        }
+
+        function changeStudentReportExam(examIdx) {
+            if (currentStudent) {
+                currentStudent.selectedExamIdx = parseInt(examIdx);
+                renderStudentReport();
+            }
+        }
+
+        function renderStudentReport() {
+            document.getElementById('display-student-name').innerText = currentStudent.name;
+            document.getElementById('display-class').innerText = `Lớp: ${currentStudent.className}`;
+            
+            const [y, m] = selectedStudentMonth.split('-');
+            document.getElementById('display-selected-month').innerText = `Tháng ${m}/${y}`;
+
+            const classDates = getClassDates(currentStudent.className);
+            const monthDates = classDates.filter(d => d.startsWith(selectedStudentMonth));
+            const attTbody = document.getElementById('report-attendance-tbody');
+
+            if (monthDates.length === 0) {
+                attTbody.innerHTML = `<tr><td colspan="4"><i>Không có lịch học nào trong tháng ${m}/${y}!</i></td></tr>`;
+            } else {
+                attTbody.innerHTML = monthDates.map((dateStr, idx) => {
+                    const rec = (currentStudent.attendanceByDate && currentStudent.attendanceByDate[dateStr]) || { att: "Có mặt", hw: "Hoàn thành" };
+                    return `
+                        <tr>
+                            <td><b>${formatDateVN(dateStr)}</b></td>
+                            <td>Buổi ${idx + 1}</td>
+                            <td>
+                                <span class="badge ${rec.att === 'Có mặt' ? 'badge-success' : (rec.att === 'Đi trễ' ? 'badge-warning' : 'badge-danger')}">
+                                    ${rec.att}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge ${rec.hw === 'Hoàn thành' ? 'badge-success' : (rec.hw === 'Nộp trễ' ? 'badge-warning' : 'badge-danger')}">
+                                    ${rec.hw}
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Bài test chọn hiển thị
+            const reports = currentStudent.examReports || [];
+            const selectorContainer = document.getElementById('student-exam-selector-box');
+            
+            if (reports.length > 0) {
+                if (currentStudent.selectedExamIdx === undefined || currentStudent.selectedExamIdx >= reports.length) {
+                    currentStudent.selectedExamIdx = 0;
+                }
+
+                if (reports.length > 1) {
+                    selectorContainer.innerHTML = `
+                        <label style="font-weight:700; font-size:0.85rem; color:#0369a1;">Chọn bài test: </label>
+                        <select onchange="changeStudentReportExam(this.value)" class="form-control" style="font-weight:700;">
+                            ${reports.map((r, idx) => `<option value="${idx}" ${idx === currentStudent.selectedExamIdx ? 'selected' : ''}>${r.examName}</option>`).join('')}
+                        </select>
+                    `;
+                } else {
+                    selectorContainer.innerHTML = `<span class="tag">📝 ${reports[0].examName}</span>`;
+                }
+
+                const currentExam = reports[currentStudent.selectedExamIdx];
+                document.getElementById('lis-score').innerText = currentExam.skills.lis;
+                document.getElementById('rw-score').innerText = currentExam.skills.rw;
+                document.getElementById('spk-score').innerText = currentExam.skills.spk;
+                document.getElementById('avg-score').innerText = calcAverage(currentExam.skills);
+                document.getElementById('teacher-main-comment').innerText = `${currentExam.examName} (${formatDateVN(currentExam.date)}): ${currentExam.mainComment || 'Không có nhận xét thêm.'}`;
+            } else {
+                selectorContainer.innerHTML = '';
+                document.getElementById('lis-score').innerText = '-';
+                document.getElementById('rw-score').innerText = '-';
+                document.getElementById('spk-score').innerText = '-';
+                document.getElementById('avg-score').innerText = '-';
+                document.getElementById('teacher-main-comment').innerText = 'Chưa có bài kiểm tra nào được ghi nhận.';
+            }
+        }
+
+        function switchAdminTab(tab) {
+            document.getElementById('tab-btn-att').classList.toggle('active', tab === 'attendance');
+            document.getElementById('tab-btn-scores').classList.toggle('active', tab === 'scores');
+            document.getElementById('tab-btn-students').classList.toggle('active', tab === 'students');
+
+            document.getElementById('admin-tab-att').classList.toggle('hidden', tab !== 'attendance');
+            document.getElementById('admin-tab-scores').classList.toggle('hidden', tab !== 'scores');
+            document.getElementById('admin-tab-students').classList.toggle('hidden', tab !== 'students');
+        }
+
+        // TAB 1: ĐIỂM DANH (ADMIN)
+        function renderAdminAttTable() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const filteredStudents = studentsData.filter(s => s.className === currentClass);
+            const classDates = getClassDates(currentClass);
+
+            const headerRow = document.getElementById('att-table-header');
+            headerRow.innerHTML = `<th>STT</th><th>Họ và Tên Học Sinh</th>` + 
+                classDates.map((dateStr, idx) => `
+                    <th style="cursor: pointer; background: #f1f5f9;" 
+                        title="Xóa/Sửa ngày học này"
+                        onclick="deleteOrEditDate('${currentClass}', ${idx})">
+                        <div style="color: #0284c7; font-weight: 700;">📅 ${formatDateVN(dateStr)}</div>
+                        <div style="font-size: 0.7rem; color: #ef4444; margin-top: 2px;">(Xóa)</div>
+                    </th>
+                `).join('');
+
+            const tbody = document.getElementById('att-table-body');
+
+            if (filteredStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${classDates.length + 2}"><i>Chưa có học sinh trong lớp này.</i></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filteredStudents.map((s, idx) => `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><b>${s.name}</b></td>
+                    ${classDates.map(dateStr => {
+                        if (!s.attendanceByDate) s.attendanceByDate = {};
+                        if (!s.attendanceByDate[dateStr]) s.attendanceByDate[dateStr] = { att: "Có mặt", hw: "Hoàn thành" };
+                        
+                        const rec = s.attendanceByDate[dateStr];
+                        return `
+                            <td>
+                                <span class="badge ${rec.att === 'Có mặt' ? 'badge-success' : (rec.att === 'Đi trễ' ? 'badge-warning' : 'badge-danger')}"
+                                      onclick="toggleAttStatus('${s.id}', '${dateStr}')">
+                                    ${rec.att}
+                                </span>
+                                <br>
+                                <small style="cursor:pointer; color:#0284c7; font-weight:bold; display:inline-block; margin-top:4px;" 
+                                       onclick="toggleHwStatus('${s.id}', '${dateStr}')">
+                                    BTVN: ${rec.hw}
+                                </small>
+                            </td>
+                        `;
+                    }).join('')}
+                </tr>
+            `).join('');
+        }
+
+        function toggleAttStatus(sId, dateStr) {
+            const s = studentsData.find(st => st.id === sId);
+            if (!s.attendanceByDate) s.attendanceByDate = {};
+            if (!s.attendanceByDate[dateStr]) s.attendanceByDate[dateStr] = { att: "Có mặt", hw: "Hoàn thành" };
+            
+            const states = ["Có mặt", "Đi trễ", "Vắng mặt"];
+            let cur = states.indexOf(s.attendanceByDate[dateStr].att);
+            s.attendanceByDate[dateStr].att = states[(cur + 1) % states.length];
+            saveData();
+            renderAdminAttTable();
+        }
+
+        function toggleHwStatus(sId, dateStr) {
+            const s = studentsData.find(st => st.id === sId);
+            if (!s.attendanceByDate) s.attendanceByDate = {};
+            if (!s.attendanceByDate[dateStr]) s.attendanceByDate[dateStr] = { att: "Có mặt", hw: "Hoàn thành" };
+
+            const states = ["Hoàn thành", "Nộp trễ", "Chưa hoàn thành"];
+            let cur = states.indexOf(s.attendanceByDate[dateStr].hw);
+            s.attendanceByDate[dateStr].hw = states[(cur + 1) % states.length];
+            saveData();
+            renderAdminAttTable();
+        }
+
+        function addNewClassDate() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateInputVal = document.getElementById('admin-date-picker').value;
+
+            if (!dateInputVal) { alert("Vui lòng chọn 1 ngày trên lịch!"); return; }
+
+            const dates = getClassDates(currentClass);
+            if (dates.includes(dateInputVal)) {
+                alert(`Ngày ${formatDateVN(dateInputVal)} đã có trong danh sách của lớp này rồi!`);
+                return;
+            }
+
+            dates.push(dateInputVal);
+            dates.sort();
+            saveData();
+            renderAdminAttTable();
+            alert(`Đã thêm ngày học ${formatDateVN(dateInputVal)} cho lớp ${currentClass}!`);
+        }
+
+        function deleteOrEditDate(className, dateIdx) {
+            const dates = getClassDates(className);
+            const currentDate = dates[dateIdx];
+
+            if (confirm(`Bạn có chắc muốn XÓA ngày học (${formatDateVN(currentDate)}) khỏi lớp ${className}?`)) {
+                dates.splice(dateIdx, 1);
+                saveData();
+                renderAdminAttTable();
+            }
+        }
+
+        // TAB 2: QUẢN LÝ ĐIỂM
+        function renderAdminScoresTable() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const filteredStudents = studentsData.filter(s => s.className === currentClass);
+
+            const tbody = document.getElementById('scores-table-body');
+            tbody.innerHTML = '';
+
+            if (filteredStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10"><i>Chưa có dữ liệu học sinh trong lớp này.</i></td></tr>`;
+                return;
+            }
+
+            filteredStudents.forEach((s, idx) => {
+                const reports = s.examReports || [];
+                const hasReports = reports.length > 0;
+
+                if (s.selectedExamIdx === undefined || s.selectedExamIdx >= reports.length) {
+                    s.selectedExamIdx = 0;
+                }
+
+                const currentExam = hasReports ? reports[s.selectedExamIdx] : null;
+                const avg = currentExam ? calcAverage(currentExam.skills) : '-';
+
+                let examSelectorHTML = '<i>Chưa có bài test</i>';
+                if (hasReports) {
+                    if (reports.length > 1) {
+                        examSelectorHTML = `<select class="form-control" style="font-size:0.8rem; padding:4px 6px;" onchange="changeAdminSelectedExam('${s.id}', this.value)">`;
+                        reports.forEach((rep, eIdx) => {
+                            const selected = eIdx === s.selectedExamIdx ? 'selected' : '';
+                            examSelectorHTML += `<option value="${eIdx}" ${selected}>${rep.examName}</option>`;
+                        });
+                        examSelectorHTML += `</select>`;
+                    } else {
+                        examSelectorHTML = `<b>${currentExam.examName}</b>`;
+                    }
+                }
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td><b>${s.name}</b></td>
+                    <td><span class="tag">${s.className}</span></td>
+                    <td>${examSelectorHTML}</td>
+                    <td>${currentExam ? formatDateVN(currentExam.date) : '-'}</td>
+                    <td>${currentExam ? currentExam.skills.lis : '-'}</td>
+                    <td>${currentExam ? currentExam.skills.rw : '-'}</td>
+                    <td>${currentExam ? currentExam.skills.spk : '-'}</td>
+                    <td style="font-weight:800; color:#ca8a04;">${avg} ${currentExam ? '/ 10' : ''}</td>
+                    <td>
+                        ${hasReports ? `<button class="btn-secondary" style="padding:4px 8px; font-size:0.8rem; color:#0284c7; margin-right:4px;" onclick="editStudentScores('${s.id}', ${s.selectedExamIdx})">✏️ Sửa Bài Này</button>` : ''}
+                        <button class="btn-success" onclick="addNewExamForStudent('${s.id}')">➕ Thêm Bài Test</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function changeAdminSelectedExam(sId, examIdx) {
+            const s = studentsData.find(st => st.id === sId);
+            if (s) {
+                s.selectedExamIdx = parseInt(examIdx);
+                renderAdminScoresTable();
+            }
+        }
+
+        function editStudentScores(id, examIdx) {
+            const s = studentsData.find(st => st.id === id);
+            if (!s) return;
+
+            document.getElementById('form-student-id').value = s.id;
+            document.getElementById('form-name').value = s.name;
+            document.getElementById('form-class').value = s.className;
+
+            if (examIdx >= 0 && s.examReports && s.examReports[examIdx]) {
+                editingExamIndex = examIdx;
+                const rep = s.examReports[examIdx];
+                document.getElementById('form-exam-name').value = rep.examName;
+                document.getElementById('form-exam-date').value = rep.date || new Date().toISOString().split('T')[0];
+                document.getElementById('form-score-lis').value = rep.skills.lis;
+                document.getElementById('form-score-rw').value = rep.skills.rw;
+                document.getElementById('form-score-spk').value = rep.skills.spk;
+                document.getElementById('form-main-comment').value = rep.mainComment || '';
+                document.getElementById('form-title').innerText = `✏️ Cập Nhật [${rep.examName}] Cho: ${s.name}`;
+            }
+            document.getElementById('score-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function addNewExamForStudent(id) {
+            const s = studentsData.find(st => st.id === id);
+            if (!s) return;
+
+            editingExamIndex = -1;
+            document.getElementById('form-student-id').value = s.id;
+            document.getElementById('form-name').value = s.name;
+            document.getElementById('form-class').value = s.className;
+            document.getElementById('form-exam-name').value = "";
+            document.getElementById('form-exam-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('form-score-lis').value = 8.0;
+            document.getElementById('form-score-rw').value = 8.0;
+            document.getElementById('form-score-spk').value = 8.0;
+            document.getElementById('form-main-comment').value = '';
+            document.getElementById('form-title').innerText = `➕ Thêm Bài Kiểm Tra Mới Cho: ${s.name}`;
+            document.getElementById('score-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function appendComment(text) {
+            const area = document.getElementById('form-main-comment');
+            area.value = area.value.trim() ? area.value + ' ' + text : text;
+        }
+
+        function generateAIComment() {
+            const name = document.getElementById('form-name').value.trim() || "Con";
+            const lis = parseFloat(document.getElementById('form-score-lis').value) || 0;
+            const rw = parseFloat(document.getElementById('form-score-rw').value) || 0;
+            const spk = parseFloat(document.getElementById('form-score-spk').value) || 0;
+            const avg = parseFloat(((lis + rw + spk) / 3).toFixed(1));
+
+            const introsEx = [
+                `Cô gửi lời khen ngợi đến ${name} vì kết quả bài kiểm tra kỳ này vô cùng ấn tượng! `,
+                `${name} đã có một buổi làm bài thi rất xuất sắc và chỉn chu. `,
+                `Cô rất tự hào về tinh thần học tập và sự tiến bộ rõ rệt của ${name}! `
+            ];
+            const introsGood = [
+                `${name} hoàn thành bài kiểm tra tương đối tốt và giữ phong độ học tập ổn định. `,
+                `Cô thấy ${name} rất cố gắng trong bài thi vừa rồi và đạt kết quả đáng khích lệ. `,
+                `Bài làm của ${name} thể hiện con nắm bài khá kĩ và có tinh thần học rất tích cực. `
+            ];
+            const introsNeedEffort = [
+                `Bài kiểm tra đợt này ${name} có đôi chỗ còn chệch xạc một chút, nhưng cô tin con sẽ làm tốt hơn ở bài sau! `,
+                `${name} rất cố gắng hoàn thành bài thi, tuy nhiên kết quả chưa thực sự đúng với khả năng của con. `,
+                `Cô thấy ${name} đã nỗ lực nhiều, chỉ cần tập trung thêm chút nữa là con sẽ tiến bộ ngay. `
+            ];
+
+            let strengthText = "";
+            if (spk >= 8.5) strengthText += "Con phản xạ nói rất tự nhiên, phát âm tròn vành rõ chữ và tự tin tương tác với cô. ";
+            else if (lis >= 8.5) strengthText += "Khả năng nghe hiểu của con rất nhạy bén, bắt từ khóa tốt và trả lời chính xác. ";
+            else if (rw >= 8.5) strengthText += "Con ghi nhớ từ vựng kĩ, viết câu chỉn chu và cẩn thận trong phần Đọc - Viết. ";
+
+            let adviceText = "";
+            if (avg >= 8.5) adviceText += "Con hãy tiếp tục phát huy sự tự tin này trong các buổi học tiếp theo nhé!";
+            else if (avg >= 7.0) adviceText += "Ở nhà con chú ý dành thêm 10-15 phút mỗi ngày xem lại từ vựng cũ để vững vàng hơn nhé.";
+            else adviceText += "Thời gian tới cô và Ba Mẹ sẽ đồng hành để giúp con luyện lại từ vựng và ngữ pháp kỹ hơn nha.";
+
+            function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+            let result = "";
+            if (avg >= 8.5) result = getRandom(introsEx) + strengthText + adviceText;
+            else if (avg >= 7.0) result = getRandom(introsGood) + strengthText + adviceText;
+            else result = getRandom(introsNeedEffort) + adviceText;
+
+            document.getElementById('form-main-comment').value = result;
+        }
+
+        function handleSaveScores(e) {
+            e.preventDefault();
+            const id = document.getElementById('form-student-id').value;
+            const inputName = document.getElementById('form-name').value.trim();
+            const className = document.getElementById('form-class').value;
+            const examDate = document.getElementById('form-exam-date').value;
+            const examName = document.getElementById('form-exam-name').value.trim();
+
+            const newReport = {
+                date: examDate,
+                examName: examName,
+                skills: {
+                    lis: parseFloat(document.getElementById('form-score-lis').value) || 0,
+                    rw: parseFloat(document.getElementById('form-score-rw').value) || 0,
+                    spk: parseFloat(document.getElementById('form-score-spk').value) || 0
+                },
+                mainComment: document.getElementById('form-main-comment').value
+            };
+
+            let s = studentsData.find(st => st.id === id) || 
+                    studentsData.find(st => st.name.toLowerCase() === inputName.toLowerCase() && st.className === className);
+
+            if (s) {
+                if (!s.examReports) s.examReports = [];
+
+                if (editingExamIndex >= 0 && s.examReports[editingExamIndex]) {
+                    s.examReports[editingExamIndex] = newReport;
+                    alert(`Đã cập nhật bài [${examName}] cho học sinh ${s.name}!`);
+                } else {
+                    s.examReports.unshift(newReport);
+                    s.selectedExamIdx = 0;
+                    alert(`Đã thêm bài kiểm tra [${examName}] mới cho học sinh ${s.name}!`);
+                }
+
+                saveData();
+                renderAdminViews();
+                resetScoreForm();
+            } else {
+                alert("Không tìm thấy học sinh này trong hệ thống. Vui lòng kiểm tra lại Tên hoặc Lớp!");
+            }
+        }
+
+        function resetScoreForm() {
+            document.getElementById('score-form').reset();
+            document.getElementById('form-student-id').value = '';
+            editingExamIndex = -1;
+            document.getElementById('form-title').innerText = "✏️ Cập Nhật Điểm Kiểm Tra & Nhận Xét";
+        }
+
+        // TAB 3: QUẢN LÝ LỚP & HỌC SINH
+        function renderClassManageTable() {
+            const tbody = document.getElementById('class-manage-tbody');
+            if (classList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4"><i>Chưa có lớp học nào!</i></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = classList.map((cName, idx) => {
+                const count = studentsData.filter(s => s.className === cName).length;
+                return `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td><b style="color:var(--pastel-blue-dark);">${cName}</b></td>
+                        <td><b>${count}</b> học sinh</td>
+                        <td>
+                            <button class="btn-warning" onclick="editClassName('${cName}')">✏️ Sửa Tên</button>
+                            <button class="btn-danger" style="padding: 6px 10px;" onclick="deleteClass('${cName}')">🗑️ Xóa Lớp</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function addNewClass() {
+            const input = document.getElementById('new-class-input');
+            const name = input.value.trim();
+
+            if (!name) { alert("Vui lòng nhập tên lớp!"); return; }
+            if (classList.includes(name)) { alert("Tên lớp đã tồn tại!"); return; }
+
+            classList.push(name);
+            saveData();
+            populateDropdowns();
+            input.value = '';
+            renderAdminViews();
+            alert(`Đã thêm lớp: ${name}`);
+        }
+
+        function editClassName(oldName) {
+            const newName = prompt(`Nhập tên mới cho lớp "${oldName}":`, oldName);
+            if (!newName || newName.trim() === '' || newName === oldName) return;
+
+            const trimmedNew = newName.trim();
+            if (classList.includes(trimmedNew)) { alert("Tên lớp đã tồn tại!"); return; }
+
+            const classIdx = classList.indexOf(oldName);
+            if (classIdx !== -1) classList[classIdx] = trimmedNew;
+
+            studentsData.forEach(s => {
+                if (s.className === oldName) s.className = trimmedNew;
+            });
+
+            saveData();
+            populateDropdowns();
+            renderAdminViews();
+        }
+
+        function deleteClass(cName) {
+            if (confirm(`Xóa lớp "${cName}"?`)) {
+                classList = classList.filter(c => c !== cName);
+                studentsData = studentsData.filter(s => s.className !== cName);
+                saveData();
+                populateDropdowns();
+                renderAdminViews();
+            }
+        }
+
+        function renderStudentManageTable() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            document.getElementById('current-class-title').innerText = currentClass || 'Chưa chọn';
+            if (currentClass) document.getElementById('new-student-class').value = currentClass;
+
+            const filteredStudents = studentsData.filter(s => s.className === currentClass);
+            const tbody = document.getElementById('student-list-tbody');
+
+            if (filteredStudents.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4"><i>Chưa có học sinh ở lớp này.</i></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filteredStudents.map((s, idx) => `
+                <tr>
+                    <td>${idx + 1}</td>
+                    <td><b>${s.name}</b></td>
+                    <td><span class="tag">${s.className}</span></td>
+                    <td>
+                        <button class="btn-danger" onclick="deleteStudent('${s.id}')">🗑️ Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function addNewStudent() {
+            const nameInput = document.getElementById('new-student-name');
+            const name = nameInput.value.trim();
+            const className = document.getElementById('new-student-class').value;
+
+            if (!name) { alert("Vui lòng nhập tên!"); return; }
+
+            const newStu = {
+                id: Date.now().toString(),
+                name: name,
+                className: className,
+                selectedExamIdx: 0,
+                examReports: [],
+                attendanceByDate: {}
+            };
+
+            studentsData.push(newStu);
+            saveData();
+            nameInput.value = '';
+            renderAdminViews();
+            alert(`Đã thêm học sinh: ${name}`);
+        }
+
+        function deleteStudent(id) {
+            const s = studentsData.find(st => st.id === id);
+            if (s && confirm(`Xóa học sinh "${s.name}"?`)) {
+                studentsData = studentsData.filter(st => st.id !== id);
+                saveData();
+                renderAdminViews();
+            }
+        }
+
+        function clearAllData() {
+            if (confirm("🚨 CẢNH BÁO: Bạn có chắc muốn xóa hết dữ liệu làm lại từ đầu?")) {
+                studentsData = [];
+                classList = DEFAULT_CLASSES;
+                classDatesMap = DEFAULT_CLASS_DATES;
+                saveData();
+                populateDropdowns();
+                renderAdminViews();
+                alert("Đã làm sạch dữ liệu!");
+            }
+        }
+
+        // KHỞI ĐỘNG HỆ THỐNG VÀ KẾT NỐI ĐÁM MÂY REALTIME
+        populateDropdowns();
+        initFirebaseListener();
     </script>
 </body>
 </html>
