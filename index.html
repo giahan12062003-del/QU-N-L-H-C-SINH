@@ -98,10 +98,10 @@
         .score-max { font-size: 0.9rem; color: var(--text-muted); font-weight: 700; }
         .card-avg { background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border: 2px solid #facc15; }
 
-        /* Gallery Grid for Report & Admin Screen */
+        /* Gallery Grid - Hiển thị chuẩn không bị cắt xén */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 16px;
             margin-top: 14px;
         }
@@ -111,17 +111,18 @@
             overflow: hidden;
             border: 2px solid #e2e8f0;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            background: #fff;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 160px;
         }
         .gallery-img {
             width: 100%;
-            height: 180px;
-            object-fit: cover;
+            max-height: 240px;
+            object-fit: contain; /* Giúp ảnh tự co giãn đầy đủ tỷ lệ, không bị cắt xén */
             display: block;
-            transition: transform 0.2s;
-        }
-        .gallery-img:hover {
-            transform: scale(1.02);
+            background: #ffffff;
         }
         .gallery-delete-btn {
             position: absolute;
@@ -140,6 +141,7 @@
             justify-content: center;
             font-size: 0.85rem;
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            z-index: 5;
         }
 
         /* Admin Panels & Tables */
@@ -236,10 +238,10 @@
                 </div>
             </div>
 
-            <!-- NỘI DUNG LỊCH ĐIỂM DANH HỌC SINH -->
+            <!-- NỘI DUNG LỊCH ĐIỂM DANH HỌC SINH & ẢNH HOẠT ĐỘNG THEO BUỔI -->
             <div class="card" style="margin-bottom: 20px;">
                 <h3 style="margin-bottom: 12px; color: var(--pastel-blue-dark); display: flex; align-items: center; gap: 8px;">
-                    🗓️ Lịch Sử Điểm Danh & BTVN Trong Tháng (<span id="display-selected-month">08/2026</span>)
+                    🗓️ Lịch Sử Điểm Danh, BTVN & Hình Ảnh Buổi Học (<span id="display-selected-month">08/2026</span>)
                 </h3>
                 <div class="table-wrapper">
                     <table>
@@ -249,6 +251,7 @@
                                 <th>Buổi Học</th>
                                 <th>Điểm Danh</th>
                                 <th>Bài Tập Về Nhà</th>
+                                <th>Ảnh Hoạt Động Buổi Này</th>
                             </tr>
                         </thead>
                         <tbody id="report-attendance-tbody"></tbody>
@@ -313,15 +316,6 @@
                 <p id="teacher-main-comment" style="line-height: 1.6; color: #334155;">Chưa có nhận xét.</p>
             </div>
 
-            <!-- BỘ SƯU TẬP ẢNH HOẠT ĐỘNG CỦA LỚP CHO PHỤ HUYNH VÀ HỌC SINH -->
-            <div class="card" style="margin-bottom: 20px;">
-                <h3 style="color: var(--pastel-blue-dark); display: flex; align-items: center; gap: 8px;">📸 Khoảnh Khắc Hoạt Động Tại Lớp</h3>
-                <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Những hình ảnh đáng yêu của các con trong các buổi học.</p>
-                <div id="student-gallery-container" class="gallery-grid">
-                    <p style="color: var(--text-muted); font-style: italic; margin-top: 10px;">Đang tải hình ảnh hoạt động...</p>
-                </div>
-            </div>
-
             <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px;">
                 <button class="btn-secondary" onclick="window.print()">🖨️ In Báo Cáo / Lưu PDF</button>
                 <button class="btn-secondary" onclick="showLogin()">↩️ Đăng Xuất</button>
@@ -332,15 +326,14 @@
         <section id="admin-view" class="hidden">
             <div class="admin-panel">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
-                    <h2 style="color: var(--pastel-purple-dark);">👩‍🏫 Quản Lý Điểm Danh & Kiểm Tra</h2>
+                    <h2 style="color: var(--pastel-purple-dark);">👩‍🏫 Quản Lý Điểm Danh, Ảnh & Kiểm Tra</h2>
                     <button class="btn-secondary" onclick="showLogin()">Thoát Admin</button>
                 </div>
 
                 <div class="tab-bar">
-                    <button class="tab-btn active" id="tab-btn-att" onclick="switchAdminTab('attendance')">1. Quản Lý Điểm Danh Theo Ngày Lịch</button>
+                    <button class="tab-btn active" id="tab-btn-att" onclick="switchAdminTab('attendance')">1. Quản Lý Điểm Danh & Ảnh Theo Ngày</button>
                     <button class="tab-btn" id="tab-btn-scores" onclick="switchAdminTab('scores')">2. Điểm Kiểm Tra & Nhận Xét</button>
                     <button class="tab-btn" id="tab-btn-students" onclick="switchAdminTab('students')">3. Quản Lý Danh Sách Lớp</button>
-                    <button class="tab-btn" id="tab-btn-gallery" onclick="switchAdminTab('gallery')">4. Quản Lý Ảnh Lớp Học</button>
                 </div>
 
                 <!-- BỘ LỌC TÌM THEO LỚP HỌC -->
@@ -351,11 +344,11 @@
                     </div>
 
                     <div style="font-size:0.85rem; color:var(--text-muted);">
-                        💡 Chọn bài test ở mục Thao Tác hoặc thêm bài mới bên dưới.
+                        💡 Quản lý buổi học, điểm danh và tải ảnh trực tiếp theo từng ngày.
                     </div>
                 </div>
 
-                <!-- TAB 1: ĐIỂM DANH THEO LỊCH CỤ THỂ -->
+                <!-- TAB 1: ĐIỂM DANH & ẢNH THEO LỊCH CỤ THỂ -->
                 <div id="admin-tab-att">
                     <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -365,6 +358,23 @@
 
                         <div style="display: flex; gap: 8px;">
                             <button class="btn-primary" onclick="addNewClassDate()">➕ Tạo Thêm Buổi Học Theo Ngày</button>
+                        </div>
+                    </div>
+
+                    <!-- KHU VỰC QUẢN LÝ ẢNH THEO NGÀY HỌC ĐƯỢC CHỌN -->
+                    <div class="card" style="margin-bottom: 20px; border-left: 5px solid var(--pastel-purple-dark);">
+                        <h3 style="color: var(--pastel-blue-dark); margin-bottom: 8px;" id="admin-gallery-box-title">🖼️ Tải Ảnh Hoạt Động Cho Buổi Học: (Chọn ngày bên dưới bảng)</h3>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 12px;">
+                            Cô có thể chọn tối đa **10 tấm ảnh** từ máy tính/điện thoại cho mỗi buổi học.
+                        </p>
+                        
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px;">
+                            <input type="file" id="date-image-file-input" class="form-control" accept="image/*" multiple style="max-width: 380px; padding: 8px;" onchange="handleDateImageUpload(event)">
+                            <span style="font-size: 0.85rem; color: #0284c7; font-weight: bold;" id="upload-status-text"></span>
+                        </div>
+
+                        <div id="admin-date-gallery-preview" class="gallery-grid">
+                            <p style="color: var(--text-muted); font-style: italic;">Chưa chọn ngày học để quản lý ảnh.</p>
                         </div>
                     </div>
 
@@ -528,33 +538,13 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: QUẢN LÝ ẢNH HOẠT ĐỘNG CỦA LỚP TỪ MÁY TÍNH / ĐIỆN THOẠI -->
-                <div id="admin-tab-gallery" class="hidden">
-                    <div class="card" style="border-left: 5px solid var(--pastel-purple-dark);">
-                        <h3 style="color: var(--pastel-blue-dark); margin-bottom: 10px;">🖼️ Tải Ảnh Lớp Học Từ Thiết Bị (Máy Tính / Điện Thoại)</h3>
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
-                            Cô có thể chọn một hoặc nhiều ảnh cùng lúc từ thư viện điện thoại hoặc máy tính. Ảnh sẽ được tự động đồng bộ lên hệ thống để phụ huynh ngắm nhìn trong phần báo cáo.
-                        </p>
-                        
-                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
-                            <input type="file" id="image-file-input" class="form-control" accept="image/*" multiple style="max-width: 380px; padding: 8px;" onchange="handleImageUpload(event)">
-                            <span style="font-size: 0.85rem; color: #0284c7; font-weight: bold;" id="upload-status-text"></span>
-                        </div>
-
-                        <h4 style="margin-bottom: 10px; font-size: 1rem; color: #334155;">Danh sách ảnh đang hiển thị trong lớp:</h4>
-                        <div id="admin-gallery-preview" class="gallery-grid">
-                            <p style="color: var(--text-muted); font-style: italic;">Chưa có ảnh nào được tải lên.</p>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </section>
 
     </div>
 
     <script>
-        // --- 1. CẤU HÌNH FIREBASE REALTIME DATABASE THẬT CỦA CÔ GIA HAN ---
+        // --- 1. CẤU HÌNH FIREBASE REALTIME DATABASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyCwU4RcKdEUxarn90pdrin4XVo1DeXRmEc",
             authDomain: "student-mangenent.firebaseapp.com",
@@ -566,7 +556,6 @@
             measurementId: "G-W9NN8ZFN26"
         };
 
-        // Khởi tạo Firebase Realtime Database
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -606,7 +595,8 @@
         let classList = DEFAULT_CLASSES;
         let classDatesMap = DEFAULT_CLASS_DATES;
         let studentsData = DEFAULT_DATA;
-        let galleryUrls = [];
+        let dateImagesMap = {}; // Lưu trữ danh sách ảnh theo định dạng: { "Pre-Starters_2026-08-01": [base64, ...] }
+        let selectedAdminDateForGallery = "";
         let editingExamIndex = -1;
 
         // --- 2. ĐỒNG BỘ DỮ LIỆU LÊN ĐÁM MÂY (FIREBASE REALTIME DATABASE) ---
@@ -615,23 +605,39 @@
                 classList: classList,
                 classDatesMap: classDatesMap,
                 studentsData: studentsData,
-                gallery: galleryUrls
+                dateImagesMap: dateImagesMap
             });
         }
 
-        // Xử lý đọc file ảnh từ máy tính hoặc điện thoại sang dạng Base64
-        function handleImageUpload(event) {
+        // Xử lý chọn ảnh theo ngày học (tối đa 10 ảnh)
+        function handleDateImageUpload(event) {
+            if (!selectedAdminDateForGallery) {
+                alert("Vui lòng bấm vào một ngày học cụ thể trong bảng điểm danh bên dưới để chọn ngày tải ảnh lên!");
+                event.target.value = "";
+                return;
+            }
+
             const files = event.target.files;
             if (!files || files.length === 0) return;
+
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const key = `${currentClass}_${selectedAdminDateForGallery}`;
+            if (!dateImagesMap[key]) dateImagesMap[key] = [];
+
+            const currentCount = dateImagesMap[key].length;
+            if (currentCount + files.length > 10) {
+                alert(`Mỗi buổi học chỉ được lưu tối đa 10 tấm ảnh! Buổi này hiện đã có ${currentCount} ảnh.`);
+                event.target.value = "";
+                return;
+            }
 
             const statusText = document.getElementById('upload-status-text');
             statusText.innerText = `Đang tải lên ${files.length} ảnh...`;
 
             let loadedCount = 0;
             Array.from(files).forEach(file => {
-                // Kiểm tra kích thước ảnh tránh làm quá tải cơ sở dữ liệu (giới hạn dưới 2MB mỗi ảnh)
                 if (file.size > 2 * 1024 * 1024) {
-                    alert(`Ảnh "${file.name}" quá lớn (>2MB). Vui lòng chọn ảnh nhỏ hơn để hệ thống tải nhanh nhất.`);
+                    alert(`Ảnh "${file.name}" quá lớn (>2MB). Vui lòng chọn ảnh nhỏ hơn.`);
                     loadedCount++;
                     if (loadedCount === files.length) statusText.innerText = "";
                     return;
@@ -639,41 +645,63 @@
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    galleryUrls.push(e.target.result); // Thêm chuỗi Base64 vào danh sách ảnh
+                    dateImagesMap[key].push(e.target.result);
                     loadedCount++;
                     if (loadedCount === files.length) {
                         saveData();
-                        renderAdminGalleryPreview();
-                        statusText.innerText = "✨ Đã tải lên và lưu thành công!";
+                        renderAdminDateGalleryPreview();
+                        renderAdminAttTable();
+                        statusText.innerText = "✨ Đã lưu ảnh thành công!";
                         setTimeout(() => { statusText.innerText = ""; }, 3000);
-                        event.target.value = ""; // Reset ô input file
+                        event.target.value = "";
                     }
                 };
                 reader.readAsDataURL(file);
             });
         }
 
-        // Xóa một ảnh trong bộ sưu tập
-        function deleteGalleryImage(index) {
-            if (confirm("Bạn có chắc muốn xóa ảnh này khỏi bộ sưu tập lớp?")) {
-                galleryUrls.splice(index, 1);
-                saveData();
-                renderAdminGalleryPreview();
+        function deleteDateGalleryImage(dateStr, index) {
+            if (confirm("Bạn có chắc muốn xóa ảnh này khỏi buổi học?")) {
+                const currentClass = document.getElementById('admin-class-filter').value;
+                const key = `${currentClass}_${dateStr}`;
+                if (dateImagesMap[key]) {
+                    dateImagesMap[key].splice(index, 1);
+                    saveData();
+                    renderAdminDateGalleryPreview();
+                    renderAdminAttTable();
+                }
             }
         }
 
-        // Hiển thị danh sách ảnh trong phần Admin
-        function renderAdminGalleryPreview() {
-            const container = document.getElementById('admin-gallery-preview');
-            if (galleryUrls && galleryUrls.length > 0) {
-                container.innerHTML = galleryUrls.map((url, idx) => `
+        function selectDateForAdminGallery(dateStr) {
+            selectedAdminDateForGallery = dateStr;
+            renderAdminDateGalleryPreview();
+        }
+
+        function renderAdminDateGalleryPreview() {
+            const container = document.getElementById('admin-date-gallery-preview');
+            const titleEl = document.getElementById('admin-gallery-box-title');
+            const currentClass = document.getElementById('admin-class-filter').value;
+
+            if (!selectedAdminDateForGallery) {
+                titleEl.innerText = `🖼️ Tải Ảnh Hoạt Động Cho Buổi Học: (Chưa chọn ngày)`;
+                container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Vui lòng bấm vào cột ngày học tương ứng trong bảng điểm danh bên dưới để thêm/xem ảnh.</p>`;
+                return;
+            }
+
+            titleEl.innerText = `🖼️ Quản Lý Ảnh Buổi Học Ngày: ${formatDateVN(selectedAdminDateForGallery)} (Lớp ${currentClass})`;
+            const key = `${currentClass}_${selectedAdminDateForGallery}`;
+            const imgs = dateImagesMap[key] || [];
+
+            if (imgs.length > 0) {
+                container.innerHTML = imgs.map((url, idx) => `
                     <div class="gallery-item">
-                        <img src="${url}" class="gallery-img" alt="Ảnh lớp">
-                        <button class="gallery-delete-btn" onclick="deleteGalleryImage(${idx})" title="Xóa ảnh">✕</button>
+                        <img src="${url}" class="gallery-img" alt="Ảnh buổi học">
+                        <button class="gallery-delete-btn" onclick="deleteDateGalleryImage('${selectedAdminDateForGallery}', ${idx})" title="Xóa ảnh">✕</button>
                     </div>
                 `).join('');
             } else {
-                container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Chưa có ảnh nào được tải lên.</p>`;
+                container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Chưa có ảnh nào cho ngày này. Hãy tải lên ở trên.</p>`;
             }
         }
 
@@ -685,7 +713,7 @@
                     if (data.classList) classList = data.classList;
                     if (data.classDatesMap) classDatesMap = data.classDatesMap;
                     if (data.studentsData) studentsData = data.studentsData;
-                    if (data.gallery) galleryUrls = data.gallery;
+                    if (data.dateImagesMap) dateImagesMap = data.dateImagesMap;
                 } else {
                     saveData();
                 }
@@ -779,10 +807,15 @@
             document.getElementById('admin-date-picker').value = today;
             document.getElementById('form-exam-date').value = today;
 
+            const classDates = getClassDates(document.getElementById('admin-class-filter').value);
+            if (classDates.length > 0) selectedAdminDateForGallery = classDates[0];
+
             renderAdminViews();
         }
 
         function onAdminFilterChange() {
+            const classDates = getClassDates(document.getElementById('admin-class-filter').value);
+            if (classDates.length > 0) selectedAdminDateForGallery = classDates[0];
             renderAdminViews();
         }
 
@@ -791,10 +824,9 @@
             renderAdminAttTable();
             renderAdminScoresTable();
             renderStudentManageTable();
-            renderAdminGalleryPreview();
+            renderAdminDateGalleryPreview();
         }
 
-        // TRA CỨU HỌC SINH
         function handleLogin(e) {
             e.preventDefault();
             const selectedClass = document.getElementById('login-class-select').value;
@@ -837,10 +869,22 @@
             const attTbody = document.getElementById('report-attendance-tbody');
 
             if (monthDates.length === 0) {
-                attTbody.innerHTML = `<tr><td colspan="4"><i>Không có lịch học nào trong tháng ${m}/${y}!</i></td></tr>`;
+                attTbody.innerHTML = `<tr><td colspan="5"><i>Không có lịch học nào trong tháng ${m}/${y}!</i></td></tr>`;
             } else {
                 attTbody.innerHTML = monthDates.map((dateStr, idx) => {
                     const rec = (currentStudent.attendanceByDate && currentStudent.attendanceByDate[dateStr]) || { att: "Có mặt", hw: "Hoàn thành" };
+                    const key = `${currentStudent.className}_${dateStr}`;
+                    const dayImgs = dateImagesMap[key] || [];
+
+                    let imgsHTML = `<span style="color:var(--text-muted); font-style:italic; font-size:0.8rem;">Chưa có ảnh</span>`;
+                    if (dayImgs.length > 0) {
+                        imgsHTML = `
+                            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+                                ${dayImgs.map(u => `<img src="${u}" style="width:50px; height:50px; object-fit:contain; border-radius:6px; border:1px solid #cbd5e1; background:#fff;" alt="Ảnh lớp">`).join('')}
+                            </div>
+                        `;
+                    }
+
                     return `
                         <tr>
                             <td><b>${formatDateVN(dateStr)}</b></td>
@@ -855,19 +899,10 @@
                                     ${rec.hw}
                                 </span>
                             </td>
+                            <td>${imgsHTML}</td>
                         </tr>
                     `;
                 }).join('');
-            }
-
-            // Hiển thị bộ sưu tập ảnh cho học sinh/phụ huynh
-            const galleryContainer = document.getElementById('student-gallery-container');
-            if (galleryUrls && galleryUrls.length > 0) {
-                galleryContainer.innerHTML = galleryUrls.map(url => 
-                    `<div class="gallery-item"><img src="${url}" class="gallery-img" alt="Ảnh hoạt động lớp"></div>`
-                ).join('');
-            } else {
-                galleryContainer.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Chưa có hình ảnh hoạt động nào được cập nhật.</p>`;
             }
 
             // Bài test chọn hiển thị
@@ -910,15 +945,13 @@
             document.getElementById('tab-btn-att').classList.toggle('active', tab === 'attendance');
             document.getElementById('tab-btn-scores').classList.toggle('active', tab === 'scores');
             document.getElementById('tab-btn-students').classList.toggle('active', tab === 'students');
-            document.getElementById('tab-btn-gallery').classList.toggle('active', tab === 'gallery');
 
             document.getElementById('admin-tab-att').classList.toggle('hidden', tab !== 'attendance');
             document.getElementById('admin-tab-scores').classList.toggle('hidden', tab !== 'scores');
             document.getElementById('admin-tab-students').classList.toggle('hidden', tab !== 'students');
-            document.getElementById('admin-tab-gallery').classList.toggle('hidden', tab !== 'gallery');
         }
 
-        // TAB 1: ĐIỂM DANH (ADMIN)
+        // TAB 1: ĐIỂM DANH & ẢNH THEO NGÀY (ADMIN)
         function renderAdminAttTable() {
             const currentClass = document.getElementById('admin-class-filter').value;
             const filteredStudents = studentsData.filter(s => s.className === currentClass);
@@ -926,14 +959,21 @@
 
             const headerRow = document.getElementById('att-table-header');
             headerRow.innerHTML = `<th>STT</th><th>Họ và Tên Học Sinh</th>` + 
-                classDates.map((dateStr, idx) => `
-                    <th style="cursor: pointer; background: #f1f5f9;" 
-                        title="Xóa/Sửa ngày học này"
-                        onclick="deleteOrEditDate('${currentClass}', ${idx})">
-                        <div style="color: #0284c7; font-weight: 700;">📅 ${formatDateVN(dateStr)}</div>
-                        <div style="font-size: 0.7rem; color: #ef4444; margin-top: 2px;">(Xóa)</div>
-                    </th>
-                `).join('');
+                classDates.map((dateStr, idx) => {
+                    const isSelected = (dateStr === selectedAdminDateForGallery);
+                    const key = `${currentClass}_${dateStr}`;
+                    const count = (dateImagesMap[key] || []).length;
+                    
+                    return `
+                        <th style="background: ${isSelected ? '#e0f2fe' : '#f8fafc'}; border: 2px solid ${isSelected ? '#0284c7' : '#e2e8f0'}; cursor: pointer;"
+                            onclick="selectDateForAdminGallery('${dateStr}')">
+                            <div style="color: #0284c7; font-weight: 700;">📅 ${formatDateVN(dateStr)}</div>
+                            <div style="font-size: 0.75rem; color: #7e22ce; margin-top: 2px;">🖼️ Ảnh: ${count}/10</div>
+                            <div style="font-size: 0.68rem; color: #ef4444; margin-top: 2px; text-decoration: underline;" 
+                                 onclick="event.stopPropagation(); deleteOrEditDate('${currentClass}', ${idx})">(Xóa ngày)</div>
+                        </th>
+                    `;
+                }).join('');
 
             const tbody = document.getElementById('att-table-body');
 
@@ -1007,8 +1047,10 @@
 
             dates.push(dateInputVal);
             dates.sort();
+            selectedAdminDateForGallery = dateInputVal;
             saveData();
             renderAdminAttTable();
+            renderAdminDateGalleryPreview();
             alert(`Đã thêm ngày học ${formatDateVN(dateInputVal)} cho lớp ${currentClass}!`);
         }
 
@@ -1018,8 +1060,12 @@
 
             if (confirm(`Bạn có chắc muốn XÓA ngày học (${formatDateVN(currentDate)}) khỏi lớp ${className}?`)) {
                 dates.splice(dateIdx, 1);
+                if (selectedAdminDateForGallery === currentDate) {
+                    selectedAdminDateForGallery = dates.length > 0 ? dates[0] : "";
+                }
                 saveData();
                 renderAdminAttTable();
+                renderAdminDateGalleryPreview();
             }
         }
 
@@ -1356,7 +1402,7 @@
                 studentsData = [];
                 classList = DEFAULT_CLASSES;
                 classDatesMap = DEFAULT_CLASS_DATES;
-                galleryUrls = [];
+                dateImagesMap = {};
                 saveData();
                 populateDropdowns();
                 renderAdminViews();
