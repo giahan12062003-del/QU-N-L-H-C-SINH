@@ -498,7 +498,7 @@
     </div>
 
     <script>
-        // --- 1. CẤU HÌNH FIREBASE REALTIME DATABASE THẬT CỦA CÔ GIA HAN ---
+        // --- 1. CẤU HÌNH FIREBASE REALTIME DATABASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyCwU4RcKdEUxarn90pdrin4XVo1DeXRmEc",
             authDomain: "student-mangenent.firebaseapp.com",
@@ -510,7 +510,6 @@
             measurementId: "G-W9NN8ZFN26"
         };
 
-        // Khởi tạo Firebase Realtime Database
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
@@ -550,10 +549,9 @@
         let classList = DEFAULT_CLASSES;
         let classDatesMap = DEFAULT_CLASS_DATES;
         let studentsData = DEFAULT_DATA;
-        let classImagesMap = {}; // Lưu ảnh theo lớp & ngày: { "Pre-Starters": { "2026-08-01": [url1, url2] } }
+        let classImagesMap = {}; 
         let editingExamIndex = -1;
 
-        // --- 2. ĐỒNG BỘ DỮ LIỆU LÊN ĐÁM MÂY (FIREBASE REALTIME DATABASE) AN TOÀN KHÔNG GHI ĐÈ ---
         function saveData() {
             db.ref('app_data').set({
                 classList: classList,
@@ -563,7 +561,6 @@
             });
         }
 
-        // Tự động lắng nghe & tải dữ liệu thời gian thực từ Firebase (Khắc phục tận gốc lỗi ghi đè dữ liệu điểm/học sinh)
         function initFirebaseListener() {
             db.ref('app_data').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -683,7 +680,6 @@
             renderStudentManageTable();
         }
 
-        // TRA CỨU HỌC SINH
         function handleLogin(e) {
             e.preventDefault();
             const selectedClass = document.getElementById('login-class-select').value;
@@ -714,7 +710,6 @@
             }
         }
 
-        // LIGHTBOX XEM ẢNH LỚN
         function openLightbox(imgUrl) {
             document.getElementById('lightbox-img').src = imgUrl;
             document.getElementById('image-lightbox').classList.remove('hidden');
@@ -741,7 +736,6 @@
                 attTbody.innerHTML = monthDates.map((dateStr, idx) => {
                     const rec = (currentStudent.attendanceByDate && currentStudent.attendanceByDate[dateStr]) || { att: "Có mặt", hw: "Hoàn thành" };
                     
-                    // Lấy ảnh hoạt động của lớp trong ngày này
                     const imgs = (classImagesMap[currentStudent.className] && classImagesMap[currentStudent.className][dateStr]) || [];
                     let imgHtml = '<span style="color:#94a3b8; font-size:0.8rem;">Chưa có ảnh</span>';
                     if (imgs.length > 0) {
@@ -772,7 +766,6 @@
                 }).join('');
             }
 
-            // Bài test chọn hiển thị
             const reports = currentStudent.examReports || [];
             const selectorContainer = document.getElementById('student-exam-selector-box');
             
@@ -818,7 +811,7 @@
             document.getElementById('admin-tab-students').classList.toggle('hidden', tab !== 'students');
         }
 
-        // TAB 1: ĐIỂM DANH & QUẢN LÝ ẢNH HOẠT ĐỘNG (ADMIN)
+        // TAB 1: ĐIỂM DANH & CHỌN ẢNH TRỰC TIẾP TỪ MÁY (ADMIN)
         function renderAdminAttTable() {
             const currentClass = document.getElementById('admin-class-filter').value;
             const filteredStudents = studentsData.filter(s => s.className === currentClass);
@@ -828,10 +821,11 @@
             headerRow.innerHTML = `<th>STT</th><th>Họ và Tên Học Sinh</th>` + 
                 classDates.map((dateStr, idx) => `
                     <th style="background: #f1f5f9;">
-                        <div style="cursor: pointer; color: #0284c7; font-weight: 700;" title="Xóa ngày học này" onclick="deleteOrEditDate('${currentClass}', ${idx})">📅 ${formatDateVN(dateStr)} <span style="font-size: 0.7rem; color: #ef4444;">(Xóa)</span></div>
+                        <div style="cursor: pointer; color: #0284c7; font-weight: 700; margin-bottom: 6px;" title="Xóa ngày học này" onclick="deleteOrEditDate('${currentClass}', ${idx})">📅 ${formatDateVN(dateStr)} <span style="font-size: 0.7rem; color: #ef4444;">(Xóa)</span></div>
                         <div style="margin-top: 6px;">
-                            <input type="text" id="img-url-input-${currentClass}-${dateStr}" placeholder="Dán link ảnh vào đây..." class="form-control" style="font-size:0.75rem; padding:4px; margin-bottom:4px;">
-                            <button class="btn-success" style="padding:2px 6px; font-size:0.75rem;" onclick="addClassActivityImage('${currentClass}', '${dateStr}')">📸 Thêm Ảnh</button>
+                            <!-- DÙNG FILE INPUT ĐỂ CHỌN ẢNH TRỰC TIẾP TỪ MÁY -->
+                            <input type="file" id="img-file-input-${currentClass}-${dateStr}" accept="image/*" class="form-control" style="font-size:0.75rem; padding:3px; margin-bottom:4px; background:#fff;">
+                            <button class="btn-success" style="padding:4px 8px; font-size:0.75rem;" onclick="uploadAndAddClassImage('${currentClass}', '${dateStr}')">📤 Tải Ảnh Lên</button>
                         </div>
                     </th>
                 `).join('');
@@ -843,7 +837,6 @@
                 return;
             }
 
-            // Thêm dòng hiển thị ảnh hoạt động chung của lớp theo ngày cho giáo viên dễ kiểm tra
             let imageRowHTML = `<tr><td>-</td><td><b>📸 Ảnh Hoạt Động Lớp</b></td>` + classDates.map(dateStr => {
                 const imgs = (classImagesMap[currentClass] && classImagesMap[currentClass][dateStr]) || [];
                 let imgCell = '<span style="color:#94a3b8; font-size:0.8rem;">Chưa có ảnh</span>';
@@ -885,21 +878,37 @@
             `).join('');
         }
 
-        function addClassActivityImage(className, dateStr) {
-            const inputId = `img-url-input-${className}-${dateStr}`;
-            const input = document.getElementById(inputId);
-            const url = input.value.trim();
+        // HÀM XỬ LÝ CHỌN ẢNH TỪ MÁY VÀ ĐỔI SANG BASE64 ĐỂ LƯU THẲNG LÊN FIREBASE
+        function uploadAndAddClassImage(className, dateStr) {
+            const fileInputId = `img-file-input-${className}-${dateStr}`;
+            const fileInput = document.getElementById(fileInputId);
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Vui lòng bấm chọn tệp ảnh từ máy tính trước nhé!");
+                return;
+            }
 
-            if (!url) { alert("Vui lòng dán đường dẫn (URL) hình ảnh vào ô!"); return; }
+            const file = fileInput.files[0];
+            const reader = new FileReader();
 
-            if (!classImagesMap[className]) classImagesMap[className] = {};
-            if (!classImagesMap[className][dateStr]) classImagesMap[className][dateStr] = [];
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
 
-            classImagesMap[className][dateStr].push(url);
-            saveData();
-            input.value = '';
-            renderAdminAttTable();
-            alert("Đã thêm hình ảnh hoạt động lớp thành công!");
+                if (!classImagesMap[className]) classImagesMap[className] = {};
+                if (!classImagesMap[className][dateStr]) classImagesMap[className][dateStr] = [];
+
+                classImagesMap[className][dateStr].push(base64Image);
+                saveData();
+                fileInput.value = ''; // Reset input
+                renderAdminAttTable();
+                alert("Đã tải ảnh lên và lưu thành công! 🎉");
+            };
+
+            reader.onerror = function() {
+                alert("Lỗi đọc file ảnh, bạn hãy chọn lại file khác nhé!");
+            };
+
+            reader.readAsDataURL(file);
         }
 
         function removeClassActivityImage(className, dateStr, imgIdx) {
@@ -1307,7 +1316,6 @@
             }
         }
 
-        // KHỞI ĐỘNG HỆ THỐNG VÀ KẾT NỐI ĐÁM MÂY REALTIME
         populateDropdowns();
         initFirebaseListener();
     </script>
