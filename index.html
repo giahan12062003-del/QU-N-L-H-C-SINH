@@ -98,24 +98,48 @@
         .score-max { font-size: 0.9rem; color: var(--text-muted); font-weight: 700; }
         .card-avg { background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border: 2px solid #facc15; }
 
-        /* Gallery Grid for Report Screen */
+        /* Gallery Grid for Report & Admin Screen */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-top: 14px;
         }
+        .gallery-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: #fff;
+        }
         .gallery-img {
             width: 100%;
             height: 180px;
             object-fit: cover;
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: block;
             transition: transform 0.2s;
         }
         .gallery-img:hover {
             transform: scale(1.02);
+        }
+        .gallery-delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
         /* Admin Panels & Tables */
@@ -504,15 +528,23 @@
                     </div>
                 </div>
 
-                <!-- TAB 4: QUẢN LÝ ẢNH HOẠT ĐỘNG CỦA LỚP -->
+                <!-- TAB 4: QUẢN LÝ ẢNH HOẠT ĐỘNG CỦA LỚP TỪ MÁY TÍNH / ĐIỆN THOẠI -->
                 <div id="admin-tab-gallery" class="hidden">
                     <div class="card" style="border-left: 5px solid var(--pastel-purple-dark);">
-                        <h3 style="color: var(--pastel-blue-dark); margin-bottom: 10px;">🖼️ Cập Nhật Bộ Ảnh Hoạt Động Của Lớp</h3>
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
-                            Dán các liên kết (URL) ảnh vào ô bên dưới, cách nhau bằng dấu phẩy (<code>,</code>). Ảnh sẽ tự động hiển thị trong phần báo cáo khi phụ huynh và học sinh đăng nhập.
+                        <h3 style="color: var(--pastel-blue-dark); margin-bottom: 10px;">🖼️ Tải Ảnh Lớp Học Từ Thiết Bị (Máy Tính / Điện Thoại)</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5;">
+                            Cô có thể chọn một hoặc nhiều ảnh cùng lúc từ thư viện điện thoại hoặc máy tính. Ảnh sẽ được tự động đồng bộ lên hệ thống để phụ huynh ngắm nhìn trong phần báo cáo.
                         </p>
-                        <textarea id="admin-gallery-urls" class="form-control" rows="5" placeholder="https://example.com/anh1.jpg, https://example.com/anh2.jpg"></textarea>
-                        <button class="btn-primary" style="margin-top: 14px;" onclick="saveGalleryToFirebase()">💾 Lưu Bộ Ảnh Lớp Học</button>
+                        
+                        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                            <input type="file" id="image-file-input" class="form-control" accept="image/*" multiple style="max-width: 380px; padding: 8px;" onchange="handleImageUpload(event)">
+                            <span style="font-size: 0.85rem; color: #0284c7; font-weight: bold;" id="upload-status-text"></span>
+                        </div>
+
+                        <h4 style="margin-bottom: 10px; font-size: 1rem; color: #334155;">Danh sách ảnh đang hiển thị trong lớp:</h4>
+                        <div id="admin-gallery-preview" class="gallery-grid">
+                            <p style="color: var(--text-muted); font-style: italic;">Chưa có ảnh nào được tải lên.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -587,12 +619,62 @@
             });
         }
 
-        // Lưu riêng bộ ảnh lên Firebase
-        function saveGalleryToFirebase() {
-            const rawText = document.getElementById('admin-gallery-urls').value;
-            galleryUrls = rawText.split(',').map(item => item.trim()).filter(item => item.length > 0);
-            saveData();
-            alert("✨ Đã cập nhật bộ ảnh thành công cho phụ huynh!");
+        // Xử lý đọc file ảnh từ máy tính hoặc điện thoại sang dạng Base64
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            const statusText = document.getElementById('upload-status-text');
+            statusText.innerText = `Đang tải lên ${files.length} ảnh...`;
+
+            let loadedCount = 0;
+            Array.from(files).forEach(file => {
+                // Kiểm tra kích thước ảnh tránh làm quá tải cơ sở dữ liệu (giới hạn dưới 2MB mỗi ảnh)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert(`Ảnh "${file.name}" quá lớn (>2MB). Vui lòng chọn ảnh nhỏ hơn để hệ thống tải nhanh nhất.`);
+                    loadedCount++;
+                    if (loadedCount === files.length) statusText.innerText = "";
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    galleryUrls.push(e.target.result); // Thêm chuỗi Base64 vào danh sách ảnh
+                    loadedCount++;
+                    if (loadedCount === files.length) {
+                        saveData();
+                        renderAdminGalleryPreview();
+                        statusText.innerText = "✨ Đã tải lên và lưu thành công!";
+                        setTimeout(() => { statusText.innerText = ""; }, 3000);
+                        event.target.value = ""; // Reset ô input file
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Xóa một ảnh trong bộ sưu tập
+        function deleteGalleryImage(index) {
+            if (confirm("Bạn có chắc muốn xóa ảnh này khỏi bộ sưu tập lớp?")) {
+                galleryUrls.splice(index, 1);
+                saveData();
+                renderAdminGalleryPreview();
+            }
+        }
+
+        // Hiển thị danh sách ảnh trong phần Admin
+        function renderAdminGalleryPreview() {
+            const container = document.getElementById('admin-gallery-preview');
+            if (galleryUrls && galleryUrls.length > 0) {
+                container.innerHTML = galleryUrls.map((url, idx) => `
+                    <div class="gallery-item">
+                        <img src="${url}" class="gallery-img" alt="Ảnh lớp">
+                        <button class="gallery-delete-btn" onclick="deleteGalleryImage(${idx})" title="Xóa ảnh">✕</button>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Chưa có ảnh nào được tải lên.</p>`;
+            }
         }
 
         // Tự động lắng nghe & tải dữ liệu thời gian thực từ Firebase
@@ -696,7 +778,6 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('admin-date-picker').value = today;
             document.getElementById('form-exam-date').value = today;
-            document.getElementById('admin-gallery-urls').value = galleryUrls.join(', ');
 
             renderAdminViews();
         }
@@ -710,7 +791,7 @@
             renderAdminAttTable();
             renderAdminScoresTable();
             renderStudentManageTable();
-            document.getElementById('admin-gallery-urls').value = galleryUrls.join(', ');
+            renderAdminGalleryPreview();
         }
 
         // TRA CỨU HỌC SINH
@@ -783,7 +864,7 @@
             const galleryContainer = document.getElementById('student-gallery-container');
             if (galleryUrls && galleryUrls.length > 0) {
                 galleryContainer.innerHTML = galleryUrls.map(url => 
-                    `<img src="${url}" class="gallery-img" alt="Ảnh hoạt động lớp" onerror="this.src='https://via.placeholder.com/220x180?text=Loi+Link+Anh'">`
+                    `<div class="gallery-item"><img src="${url}" class="gallery-img" alt="Ảnh hoạt động lớp"></div>`
                 ).join('');
             } else {
                 galleryContainer.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Chưa có hình ảnh hoạt động nào được cập nhật.</p>`;
