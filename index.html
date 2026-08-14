@@ -3,59 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Quản Lý Học Sinh & Điểm Kiểm Tra</title>
+    <title>Hệ Thống Quản Lý Học Sinh</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
     <style>
-        :root {
-            --bg-cream: #faf8f5; --pastel-blue: #e0f2fe; --pastel-blue-dark: #0284c7;
-            --pastel-pink: #fce7f3; --pastel-pink-dark: #db2777; --pastel-purple: #f3e8ff;
-            --pastel-purple-dark: #7e22ce; --pastel-yellow: #fef9c3; --pastel-yellow-dark: #ca8a04;
-            --pastel-green: #dcfce7; --pastel-green-dark: #15803d; --text-main: #1e293b;
-            --text-muted: #64748b; --card-bg: #ffffff; --border-radius: 16px;
-            --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-        }
+        :root { --bg-cream: #faf8f5; --pastel-blue-dark: #0284c7; --pastel-purple-dark: #7e22ce; --card-bg: #ffffff; --border-radius: 16px; --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-cream); padding: 16px; }
         .container { width: 100%; max-width: 1100px; margin: 0 auto; }
+        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 18px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; margin-bottom: 20px; }
         .hidden { display: none !important; }
-        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 18px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; }
         .btn-primary { padding: 10px 16px; background: #0284c7; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
         .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 5px; }
         /* Style cho bộ ảnh */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
         .gallery-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; border: 2px solid #e2e8f0; }
-        /* Giữ nguyên các style cũ của cô từ dòng 40 trở đi đến hết... */
     </style>
 </head>
 <body>
 
-    <!-- [CÁC PHẦN CŨ CỦA CÔ VẪN GIỮ NGUYÊN] -->
-    <!-- (Từ header, login-view, report-view, admin-view cũ của cô...) -->
-    <!-- Cô chỉ cần chèn thêm vào các vị trí dưới đây -->
-
-    <!-- VỊ TRÍ 1: Trong Admin (Tab 3 hoặc khu vực phù hợp) -->
-    <div class="card" style="margin-top: 20px;">
-        <h3 style="color: var(--pastel-blue-dark);">🖼️ Cập Nhật Bộ Ảnh Hoạt Động (Nhập link, cách nhau bởi dấu phẩy)</h3>
-        <textarea id="admin-gallery-urls" class="form-control" placeholder="Dán link ảnh tại đây..."></textarea>
-        <button class="btn-primary" style="margin-top: 10px;" onclick="saveGallery()">Lưu bộ ảnh cho phụ huynh</button>
+    <!-- [NỘI DUNG NGUYÊN BẢN CỦA CÔ] -->
+    <div id="report-view" class="container hidden">
+        <!-- ... Các phần cũ ... -->
+        
+        <!-- THÊM VỊ TRÍ HIỂN THỊ ẢNH -->
+        <div class="card">
+            <h3 style="color: var(--pastel-blue-dark);">📸 Hoạt động của lớp</h3>
+            <div id="gallery-container" class="gallery-grid">
+                <p>Đang tải ảnh...</p>
+            </div>
+        </div>
     </div>
 
-    <!-- VỊ TRÍ 2: Trong Report View (Dưới phần Nhận xét giáo viên) -->
-    <div class="card" style="margin-top: 20px;">
-        <h3 style="color: var(--pastel-blue-dark);">📸 Hoạt động của lớp</h3>
-        <div id="gallery-container" class="gallery-grid">
-            <p>Đang tải ảnh...</p>
+    <!-- THÊM VỊ TRÍ ADMIN TRONG TAB 3 -->
+    <div id="admin-tab-students" class="hidden">
+        <!-- ... Các phần quản lý học sinh cũ ... -->
+        
+        <div class="card">
+            <h3 style="color: var(--pastel-blue-dark);">🖼️ Cập Nhật Bộ Ảnh Hoạt Động (Dán link ảnh, cách nhau bởi dấu phẩy)</h3>
+            <textarea id="admin-gallery-urls" class="form-control" placeholder="Ví dụ: link1.jpg, link2.jpg..."></textarea>
+            <button class="btn-primary" style="margin-top: 10px;" onclick="saveGallery()">Lưu bộ ảnh</button>
         </div>
     </div>
 
     <script>
-        // --- 1. CONFIG & INIT (Giữ nguyên của cô) ---
-        // ... (Config Firebase của cô) ...
+        // ... (Cấu hình Firebase của cô) ...
         const db = firebase.database();
 
-        // --- 2. HÀM MỚI ---
+        // 1. Hàm lưu ảnh
         function saveGallery() {
             const inputVal = document.getElementById('admin-gallery-urls').value;
             const urls = inputVal.split(',').map(s => s.trim()).filter(s => s.length > 0);
@@ -64,26 +60,24 @@
               .catch((e) => alert("Lỗi: " + e.message));
         }
 
-        // --- 3. CẬP NHẬT TRONG INIT FIREBASE ---
+        // 2. Hàm load ảnh khi khởi động
         function initFirebaseListener() {
             db.ref('app_data').on('value', (snapshot) => {
                 const data = snapshot.val();
-                if (data) {
-                    // ... các dữ liệu cũ ...
-                    
-                    // Thêm phần hiển thị ảnh mới
-                    if (data.gallery) {
-                        const container = document.getElementById('gallery-container');
-                        if (container) {
-                            container.innerHTML = data.gallery.map(url => 
-                                `<img src="${url}" class="gallery-img">`
-                            ).join('');
-                        }
+                if (data && data.gallery) {
+                    const container = document.getElementById('gallery-container');
+                    if (container) {
+                        container.innerHTML = data.gallery.map(url => 
+                            `<img src="${url}" class="gallery-img">`
+                        ).join('');
                     }
+                    document.getElementById('admin-gallery-urls').value = data.gallery.join(', ');
                 }
             });
         }
-        // [CÁC HÀM CÒN LẠI CỦA CÔ GIỮ NGUYÊN...]
+        
+        // [CÁC HÀM CŨ CỦA CÔ GIỮ NGUYÊN Ở ĐÂY]
+        initFirebaseListener();
     </script>
 </body>
 </html>
