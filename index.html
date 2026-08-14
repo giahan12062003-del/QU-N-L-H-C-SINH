@@ -3,81 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hệ Thống Quản Lý Học Sinh</title>
+    <title>Hệ Thống Quản Lý Học Sinh & Điểm Kiểm Tra</title>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
     <style>
-        :root { --bg-cream: #faf8f5; --pastel-blue-dark: #0284c7; --pastel-purple-dark: #7e22ce; --card-bg: #ffffff; --border-radius: 16px; --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: var(--bg-cream); padding: 16px; }
-        .container { width: 100%; max-width: 1100px; margin: 0 auto; }
-        .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 18px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; margin-bottom: 20px; }
-        .hidden { display: none !important; }
-        .btn-primary { padding: 10px 16px; background: #0284c7; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; }
-        .form-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; margin-top: 5px; }
-        /* Style cho bộ ảnh */
-        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
-        .gallery-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; border: 2px solid #e2e8f0; }
+        :root {
+            --bg-cream: #faf8f5;
+            --pastel-blue-dark: #0284c7;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --border-radius: 16px;
+            --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            color: var(--text-main);
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            background: var(--pastel-blue-dark);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            margin-top: 6px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--pastel-blue-dark);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .gallery-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+
+        .gallery-img:hover {
+            transform: scale(1.02);
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .tab-btn.active {
+            background: var(--pastel-blue-dark);
+            color: white;
+        }
     </style>
 </head>
 <body>
 
-    <!-- [NỘI DUNG NGUYÊN BẢN CỦA CÔ] -->
-    <div id="report-view" class="container hidden">
-        <!-- ... Các phần cũ ... -->
-        
-        <!-- THÊM VỊ TRÍ HIỂN THỊ ẢNH -->
-        <div class="card">
-            <h3 style="color: var(--pastel-blue-dark);">📸 Hoạt động của lớp</h3>
-            <div id="gallery-container" class="gallery-grid">
-                <p>Đang tải ảnh...</p>
+    <div class="container">
+        <div id="login-view" class="card">
+            <h2>🔐 Đăng nhập hệ thống</h2>
+            <div style="margin-top: 15px;">
+                <label>Mật khẩu quản trị / Mã học sinh:</label>
+                <input type="password" id="access-code" class="form-control" placeholder="Nhập mã truy cập...">
+                <button class="btn-primary" style="margin-top: 15px;" onclick="handleLogin()">Truy cập</button>
+            </div>
+        </div>
+
+        <div id="report-view" class="container hidden">
+            <div class="card">
+                <h2>📊 Báo cáo học tập của học sinh</h2>
+                <div id="student-report-content" style="margin-top: 15px;"></div>
+            </div>
+
+            <div class="card">
+                <h3 style="color: var(--pastel-blue-dark);">📸 Hoạt động của lớp</h3>
+                <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Những khoảnh khắc đáng yêu của các con tại lớp.</p>
+                <div id="gallery-container" class="gallery-grid">
+                    <p style="color: var(--text-muted); font-style: italic;">Đang tải hình ảnh hoạt động...</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-view" class="container hidden">
+            <div class="card">
+                <h2>⚙️ Trang Quản Trị Giáo Viên</h2>
+                
+                <div class="admin-tabs" style="margin-top: 20px;">
+                    <button class="tab-btn active" onclick="switchAdminTab(1)">1. Nhập điểm</button>
+                    <button class="tab-btn" onclick="switchAdminTab(2)">2. Nhận xét</button>
+                    <button class="tab-btn" onclick="switchAdminTab(3)">3. Quản lý lớp & Ảnh</button>
+                </div>
+
+                <div id="admin-tab-1" class="admin-tab-content">
+                    <p>Khu vực quản lý điểm kiểm tra.</p>
+                </div>
+                
+                <div id="admin-tab-2" class="admin-tab-content hidden">
+                    <p>Khu vực nhận xét học sinh.</p>
+                </div>
+
+                <div id="admin-tab-3" class="admin-tab-content hidden">
+                    <h3 style="color: var(--pastel-blue-dark); margin-bottom: 10px;">🖼️ Cập Nhật Bộ Ảnh Hoạt Động Của Lớp</h3>
+                    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">
+                        Dán các link ảnh vào ô bên dưới, cách nhau bằng dấu phẩy (<code>,</code>). Ảnh sẽ tự động cập nhật bên máy phụ huynh.
+                    </p>
+                    <textarea id="admin-gallery-urls" class="form-control" rows="4" placeholder="https://example.com/anh1.jpg, https://example.com/anh2.jpg"></textarea>
+                    <button class="btn-primary" style="margin-top: 12px;" onclick="saveGalleryToFirebase()">💾 Lưu bộ ảnh cho phụ huynh</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- THÊM VỊ TRÍ ADMIN TRONG TAB 3 -->
-    <div id="admin-tab-students" class="hidden">
-        <!-- ... Các phần quản lý học sinh cũ ... -->
-        
-        <div class="card">
-            <h3 style="color: var(--pastel-blue-dark);">🖼️ Cập Nhật Bộ Ảnh Hoạt Động (Dán link ảnh, cách nhau bởi dấu phẩy)</h3>
-            <textarea id="admin-gallery-urls" class="form-control" placeholder="Ví dụ: link1.jpg, link2.jpg..."></textarea>
-            <button class="btn-primary" style="margin-top: 10px;" onclick="saveGallery()">Lưu bộ ảnh</button>
-        </div>
-    </div>
-
     <script>
-        // ... (Cấu hình Firebase của cô) ...
+        const firebaseConfig = {
+            databaseURL: "https://YOUR-DATABASE-NAME.firebaseio.com"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.database();
 
-        // 1. Hàm lưu ảnh
-        function saveGallery() {
-            const inputVal = document.getElementById('admin-gallery-urls').value;
-            const urls = inputVal.split(',').map(s => s.trim()).filter(s => s.length > 0);
-            db.ref('app_data/gallery').set(urls)
-              .then(() => alert("Đã cập nhật bộ ảnh thành công!"))
-              .catch((e) => alert("Lỗi: " + e.message));
+        function saveGalleryToFirebase() {
+            const rawText = document.getElementById('admin-gallery-urls').value;
+            const urlArray = rawText.split(',').map(item => item.trim()).filter(item => item.length > 0);
+
+            db.ref('app_data/gallery').set(urlArray)
+                .then(() => {
+                    alert("✨ Đã cập nhật bộ ảnh thành công cho phụ huynh!");
+                })
+                .catch((error) => {
+                    alert("❌ Lỗi khi lưu: " + error.message);
+                });
         }
 
-        // 2. Hàm load ảnh khi khởi động
         function initFirebaseListener() {
             db.ref('app_data').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data && data.gallery) {
                     const container = document.getElementById('gallery-container');
                     if (container) {
-                        container.innerHTML = data.gallery.map(url => 
-                            `<img src="${url}" class="gallery-img">`
-                        ).join('');
+                        if (data.gallery.length > 0) {
+                            container.innerHTML = data.gallery.map(url => 
+                                `<img src="${url}" class="gallery-img" alt="Ảnh hoạt động lớp" onerror="this.src='https://via.placeholder.com/220x180?text=Loi+Link+Anh'">`
+                            ).join('');
+                        } else {
+                            container.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Chưa có ảnh nào được cập nhật.</p>`;
+                        }
                     }
-                    document.getElementById('admin-gallery-urls').value = data.gallery.join(', ');
+                    
+                    const adminInput = document.getElementById('admin-gallery-urls');
+                    if (adminInput && document.activeElement !== adminInput) {
+                        adminInput.value = data.gallery.join(', ');
+                    }
                 }
             });
         }
-        
-        // [CÁC HÀM CŨ CỦA CÔ GIỮ NGUYÊN Ở ĐÂY]
-        initFirebaseListener();
+
+        function switchAdminTab(tabIndex) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(`admin-tab-${tabIndex}`).classList.remove('hidden');
+            event.currentTarget.classList.add('active');
+        }
+
+        function handleLogin() {
+            const code = document.getElementById('access-code').value;
+            if(code === "admin") {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('admin-view').classList.remove('hidden');
+            } else {
+                document.getElementById('login-view').classList.add('hidden');
+                document.getElementById('report-view').classList.remove('hidden');
+            }
+        }
+
+        window.onload = function() {
+            initFirebaseListener();
+        };
     </script>
 </body>
 </html>
