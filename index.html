@@ -98,6 +98,26 @@
         .score-max { font-size: 0.9rem; color: var(--text-muted); font-weight: 700; }
         .card-avg { background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%); border: 2px solid #facc15; }
 
+        /* Gallery Grid for Report Screen */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 14px;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+        }
+        .gallery-img:hover {
+            transform: scale(1.02);
+        }
+
         /* Admin Panels & Tables */
         .admin-panel { background: #ffffff; border-radius: var(--border-radius); padding: 24px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; }
         .tab-bar { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; flex-wrap: wrap; }
@@ -269,6 +289,15 @@
                 <p id="teacher-main-comment" style="line-height: 1.6; color: #334155;">Chưa có nhận xét.</p>
             </div>
 
+            <!-- BỘ SƯU TẬP ẢNH HOẠT ĐỘNG CỦA LỚP CHO PHỤ HUYNH VÀ HỌC SINH -->
+            <div class="card" style="margin-bottom: 20px;">
+                <h3 style="color: var(--pastel-blue-dark); display: flex; align-items: center; gap: 8px;">📸 Khoảnh Khắc Hoạt Động Tại Lớp</h3>
+                <p style="color: var(--text-muted); font-size: 0.88rem; margin-top: 4px;">Những hình ảnh đáng yêu của các con trong các buổi học.</p>
+                <div id="student-gallery-container" class="gallery-grid">
+                    <p style="color: var(--text-muted); font-style: italic; margin-top: 10px;">Đang tải hình ảnh hoạt động...</p>
+                </div>
+            </div>
+
             <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px;">
                 <button class="btn-secondary" onclick="window.print()">🖨️ In Báo Cáo / Lưu PDF</button>
                 <button class="btn-secondary" onclick="showLogin()">↩️ Đăng Xuất</button>
@@ -287,6 +316,7 @@
                     <button class="tab-btn active" id="tab-btn-att" onclick="switchAdminTab('attendance')">1. Quản Lý Điểm Danh Theo Ngày Lịch</button>
                     <button class="tab-btn" id="tab-btn-scores" onclick="switchAdminTab('scores')">2. Điểm Kiểm Tra & Nhận Xét</button>
                     <button class="tab-btn" id="tab-btn-students" onclick="switchAdminTab('students')">3. Quản Lý Danh Sách Lớp</button>
+                    <button class="tab-btn" id="tab-btn-gallery" onclick="switchAdminTab('gallery')">4. Quản Lý Ảnh Lớp Học</button>
                 </div>
 
                 <!-- BỘ LỌC TÌM THEO LỚP HỌC -->
@@ -474,6 +504,18 @@
                     </div>
                 </div>
 
+                <!-- TAB 4: QUẢN LÝ ẢNH HOẠT ĐỘNG CỦA LỚP -->
+                <div id="admin-tab-gallery" class="hidden">
+                    <div class="card" style="border-left: 5px solid var(--pastel-purple-dark);">
+                        <h3 style="color: var(--pastel-blue-dark); margin-bottom: 10px;">🖼️ Cập Nhật Bộ Ảnh Hoạt Động Của Lớp</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                            Dán các liên kết (URL) ảnh vào ô bên dưới, cách nhau bằng dấu phẩy (<code>,</code>). Ảnh sẽ tự động hiển thị trong phần báo cáo khi phụ huynh và học sinh đăng nhập.
+                        </p>
+                        <textarea id="admin-gallery-urls" class="form-control" rows="5" placeholder="https://example.com/anh1.jpg, https://example.com/anh2.jpg"></textarea>
+                        <button class="btn-primary" style="margin-top: 14px;" onclick="saveGalleryToFirebase()">💾 Lưu Bộ Ảnh Lớp Học</button>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -532,16 +574,25 @@
         let classList = DEFAULT_CLASSES;
         let classDatesMap = DEFAULT_CLASS_DATES;
         let studentsData = DEFAULT_DATA;
+        let galleryUrls = [];
         let editingExamIndex = -1;
 
         // --- 2. ĐỒNG BỘ DỮ LIỆU LÊN ĐÁM MÂY (FIREBASE REALTIME DATABASE) ---
         function saveData() {
-            // Lưu dữ liệu trực tiếp lên Firebase Cloud
             db.ref('app_data').set({
                 classList: classList,
                 classDatesMap: classDatesMap,
-                studentsData: studentsData
+                studentsData: studentsData,
+                gallery: galleryUrls
             });
+        }
+
+        // Lưu riêng bộ ảnh lên Firebase
+        function saveGalleryToFirebase() {
+            const rawText = document.getElementById('admin-gallery-urls').value;
+            galleryUrls = rawText.split(',').map(item => item.trim()).filter(item => item.length > 0);
+            saveData();
+            alert("✨ Đã cập nhật bộ ảnh thành công cho phụ huynh!");
         }
 
         // Tự động lắng nghe & tải dữ liệu thời gian thực từ Firebase
@@ -552,8 +603,8 @@
                     if (data.classList) classList = data.classList;
                     if (data.classDatesMap) classDatesMap = data.classDatesMap;
                     if (data.studentsData) studentsData = data.studentsData;
+                    if (data.gallery) galleryUrls = data.gallery;
                 } else {
-                    // Nếu trên cloud chưa có dữ liệu, khởi tạo bản mẫu lên cloud
                     saveData();
                 }
                 populateDropdowns();
@@ -645,6 +696,7 @@
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('admin-date-picker').value = today;
             document.getElementById('form-exam-date').value = today;
+            document.getElementById('admin-gallery-urls').value = galleryUrls.join(', ');
 
             renderAdminViews();
         }
@@ -658,6 +710,7 @@
             renderAdminAttTable();
             renderAdminScoresTable();
             renderStudentManageTable();
+            document.getElementById('admin-gallery-urls').value = galleryUrls.join(', ');
         }
 
         // TRA CỨU HỌC SINH
@@ -726,6 +779,16 @@
                 }).join('');
             }
 
+            // Hiển thị bộ sưu tập ảnh cho học sinh/phụ huynh
+            const galleryContainer = document.getElementById('student-gallery-container');
+            if (galleryUrls && galleryUrls.length > 0) {
+                galleryContainer.innerHTML = galleryUrls.map(url => 
+                    `<img src="${url}" class="gallery-img" alt="Ảnh hoạt động lớp" onerror="this.src='https://via.placeholder.com/220x180?text=Loi+Link+Anh'">`
+                ).join('');
+            } else {
+                galleryContainer.innerHTML = `<p style="color: var(--text-muted); font-style: italic;">Chưa có hình ảnh hoạt động nào được cập nhật.</p>`;
+            }
+
             // Bài test chọn hiển thị
             const reports = currentStudent.examReports || [];
             const selectorContainer = document.getElementById('student-exam-selector-box');
@@ -766,10 +829,12 @@
             document.getElementById('tab-btn-att').classList.toggle('active', tab === 'attendance');
             document.getElementById('tab-btn-scores').classList.toggle('active', tab === 'scores');
             document.getElementById('tab-btn-students').classList.toggle('active', tab === 'students');
+            document.getElementById('tab-btn-gallery').classList.toggle('active', tab === 'gallery');
 
             document.getElementById('admin-tab-att').classList.toggle('hidden', tab !== 'attendance');
             document.getElementById('admin-tab-scores').classList.toggle('hidden', tab !== 'scores');
             document.getElementById('admin-tab-students').classList.toggle('hidden', tab !== 'students');
+            document.getElementById('admin-tab-gallery').classList.toggle('hidden', tab !== 'gallery');
         }
 
         // TAB 1: ĐIỂM DANH (ADMIN)
@@ -1008,7 +1073,7 @@
             const introsNeedEffort = [
                 `Bài kiểm tra đợt này ${name} có đôi chỗ còn chệch xạc một chút, nhưng cô tin con sẽ làm tốt hơn ở bài sau! `,
                 `${name} rất cố gắng hoàn thành bài thi, tuy nhiên kết quả chưa thực sự đúng với khả năng của con. `,
-                `Cô thấy ${name} đã nỗ lực nhiều, chỉ cần tập trung thêm chút nữa là con sẽ tiến bộ ngay. `
+                `Cô thấy ${name} đã nổ lực nhiều, chỉ cần tập trung thêm chút nữa là con sẽ tiến bộ ngay. `
             ];
 
             let strengthText = "";
@@ -1210,6 +1275,7 @@
                 studentsData = [];
                 classList = DEFAULT_CLASSES;
                 classDatesMap = DEFAULT_CLASS_DATES;
+                galleryUrls = [];
                 saveData();
                 populateDropdowns();
                 renderAdminViews();
