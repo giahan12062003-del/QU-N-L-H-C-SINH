@@ -301,6 +301,374 @@
         #image-lightbox.hidden { display: none !important; }
 
         .hidden { display: none !important; }
+
+        /* =========================================================
+           MOBILE V5 — app-like layout, no horizontal taskbar
+           ========================================================= */
+        .mobile-appbar,
+        .mobile-drawer,
+        .mobile-drawer-backdrop,
+        .mobile-bottom-nav {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            html, body {
+                width: 100%;
+                max-width: 100%;
+                min-height: 100%;
+                overflow-x: hidden !important;
+            }
+
+            body {
+                background: #f8fafc;
+                padding-bottom: 76px !important;
+            }
+
+            /* Hide the desktop sidebar entirely on phones. */
+            .sidebar,
+            .desktop-sidebar {
+                display: none !important;
+            }
+
+            /* Main content takes the full viewport. */
+            .main-content,
+            .content,
+            .main,
+            .app-content,
+            .dashboard-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                margin: 0 !important;
+                padding-left: 14px !important;
+                padding-right: 14px !important;
+                box-sizing: border-box !important;
+                overflow-x: hidden !important;
+            }
+
+            .mobile-appbar {
+                display: flex;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                height: 58px;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                padding: 0 12px;
+                background: rgba(255,255,255,.97);
+                border-bottom: 1px solid #dbe5ef;
+                box-shadow: 0 2px 12px rgba(15,23,42,.07);
+                backdrop-filter: blur(10px);
+            }
+
+            .mobile-app-title {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                min-width: 0;
+                color: #0369a1;
+                font-size: 15px;
+                font-weight: 800;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .mobile-app-icon {
+                display: grid;
+                place-items: center;
+                width: 34px;
+                height: 34px;
+                flex: 0 0 34px;
+                border-radius: 11px;
+                background: #fff7cc;
+                font-size: 19px;
+            }
+
+            .mobile-menu-trigger {
+                width: 40px;
+                height: 40px;
+                flex: 0 0 40px;
+                border: 0;
+                border-radius: 12px;
+                background: #eff6ff;
+                color: #0369a1;
+                font-size: 22px;
+                line-height: 1;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-more-trigger {
+                font-size: 18px;
+                letter-spacing: 2px;
+            }
+
+            .mobile-drawer-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 1100;
+                background: rgba(15,23,42,.38);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .2s ease;
+            }
+
+            .mobile-drawer {
+                display: flex;
+                position: fixed;
+                z-index: 1110;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: min(86vw, 340px);
+                flex-direction: column;
+                background: #fff;
+                box-shadow: 10px 0 30px rgba(15,23,42,.16);
+                transform: translateX(-105%);
+                transition: transform .24s ease;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            body.mobile-menu-open .mobile-drawer {
+                transform: translateX(0);
+            }
+
+            body.mobile-menu-open .mobile-drawer-backdrop {
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            .mobile-drawer-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 22px 18px 18px;
+                border-bottom: 1px solid #e2e8f0;
+                background: linear-gradient(135deg, #eff8ff, #fff);
+            }
+
+            .mobile-drawer-kicker {
+                font-size: 10px;
+                font-weight: 800;
+                letter-spacing: .08em;
+                color: #64748b;
+                margin-bottom: 5px;
+            }
+
+            .mobile-drawer-name {
+                color: #0369a1;
+                font-size: 22px;
+                font-weight: 900;
+            }
+
+            .mobile-drawer-close {
+                width: 38px;
+                height: 38px;
+                border: 0;
+                border-radius: 12px;
+                background: #f1f5f9;
+                color: #334155;
+                font-size: 26px;
+                cursor: pointer;
+            }
+
+            .mobile-drawer-nav {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                padding: 14px 12px;
+            }
+
+            .mobile-drawer-nav button,
+            .mobile-drawer-actions button {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                width: 100%;
+                min-height: 48px;
+                padding: 10px 12px;
+                border: 0;
+                border-radius: 12px;
+                background: transparent;
+                color: #475569;
+                font-size: 14px;
+                font-weight: 700;
+                text-align: left;
+                cursor: pointer;
+            }
+
+            .mobile-drawer-nav button.active {
+                background: #e0f2fe;
+                color: #0369a1;
+            }
+
+            .mobile-drawer-actions {
+                margin-top: auto;
+                padding: 12px;
+                border-top: 1px solid #e2e8f0;
+            }
+
+            .mobile-drawer-actions button:first-child {
+                border: 1px solid #cbd5e1;
+                background: #fff;
+                color: #1e293b;
+                margin-bottom: 7px;
+            }
+
+            .mobile-drawer-actions button:last-child {
+                color: #64748b;
+            }
+
+            /* Compact page headings and filters. */
+            .page-header,
+            .section-header,
+            .content-header {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 9px !important;
+                margin: 14px 0 12px !important;
+                padding: 0 !important;
+            }
+
+            .page-header h1,
+            .section-header h2,
+            .content-header h1 {
+                font-size: 21px !important;
+                line-height: 1.25 !important;
+                margin: 0 !important;
+            }
+
+            .month-filter,
+            .date-filter,
+            .date-picker,
+            .filter-box,
+            .calendar-filter {
+                width: 100% !important;
+                max-width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            /* No oversized cards on mobile. */
+            .dashboard-grid,
+            .grid-cards,
+            .overview-grid-4,
+            .stats-grid,
+            .cards-grid,
+            .summary-grid,
+            .form-grid {
+                grid-template-columns: 1fr !important;
+                width: 100% !important;
+            }
+
+            .card,
+            .stat-card,
+            .summary-card,
+            .lesson-card-box {
+                min-width: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+
+            .lesson-card-box {
+                padding: 14px !important;
+                min-height: auto !important;
+            }
+
+            .lesson-card-box h4 {
+                font-size: 13px !important;
+                margin-bottom: 6px !important;
+            }
+
+            .lesson-card-box p {
+                font-size: 15px !important;
+                line-height: 1.45 !important;
+            }
+
+            .lesson-resource-upload-grid,
+            .lesson-student-resources {
+                grid-template-columns: 1fr !important;
+            }
+
+            .lesson-resource-image-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            /* Only tables may scroll horizontally; the page itself never does. */
+            .table-container,
+            .table-wrapper,
+            .responsive-table {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 12px;
+            }
+
+            table {
+                min-width: 620px;
+            }
+
+            footer,
+            .footer {
+                margin: 18px 0 0 !important;
+                padding: 12px 0 !important;
+                text-align: center !important;
+                font-size: 11px !important;
+            }
+
+            .mobile-bottom-nav {
+                display: grid !important;
+                position: fixed !important;
+                z-index: 1050 !important;
+                left: 10px !important;
+                right: 10px !important;
+                bottom: 10px !important;
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 4px !important;
+                padding: 6px !important;
+                border: 1px solid #dbe5ef !important;
+                border-radius: 18px !important;
+                background: rgba(255,255,255,.96) !important;
+                box-shadow: 0 8px 28px rgba(15,23,42,.14) !important;
+                backdrop-filter: blur(12px);
+            }
+
+            .mobile-bottom-nav button {
+                min-height: 52px;
+                border: 0;
+                border-radius: 13px;
+                background: transparent;
+                color: #64748b;
+                font-size: 10px;
+                font-weight: 800;
+                cursor: pointer;
+            }
+
+            .mobile-bottom-nav button span {
+                display: block;
+                font-size: 19px;
+                line-height: 22px;
+                margin-bottom: 2px;
+            }
+
+            .mobile-bottom-nav button.active {
+                background: #e0f2fe;
+                color: #0369a1;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-bottom-nav {
+                display: none !important;
+            }
+        }
+
         @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } .grid-cards { grid-template-columns: 1fr; } .overview-grid-4 { grid-template-columns: 1fr; } }
 
         /* =========================================================
@@ -817,6 +1185,36 @@
     </style>
 </head>
 <body>
+    <div class="mobile-appbar">
+        <button class="mobile-menu-trigger" type="button" onclick="toggleMobileMenu()" aria-label="Mở menu">☰</button>
+        <div class="mobile-app-title"><span class="mobile-app-icon">🎓</span><span>Hanna English Class</span></div>
+        <button class="mobile-menu-trigger mobile-more-trigger" type="button" onclick="toggleMobileMenu()" aria-label="Mở menu">•••</button>
+    </div>
+
+    <div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop" onclick="closeMobileMenu()"></div>
+    <aside class="mobile-drawer" id="mobile-drawer" aria-label="Menu điều hướng điện thoại">
+        <div class="mobile-drawer-head">
+            <div>
+                <div class="mobile-drawer-kicker">HỆ THỐNG HỌC TẬP</div>
+                <div class="mobile-drawer-name" id="mobile-drawer-student-name">Học sinh</div>
+            </div>
+            <button type="button" class="mobile-drawer-close" onclick="closeMobileMenu()">×</button>
+        </div>
+        <nav class="mobile-drawer-nav">
+            <button type="button" data-mobile-section="overview" onclick="mobileNavigate('overview')">🏠 <span>Tổng Quan</span></button>
+            <button type="button" data-mobile-section="history" onclick="mobileNavigate('history')">📅 <span>Lịch Sử Học Tập</span></button>
+            <button type="button" data-mobile-section="lesson" onclick="mobileNavigate('lesson')">📖 <span>Bài Học Trong Ngày</span></button>
+            <button type="button" data-mobile-section="gallery" onclick="mobileNavigate('gallery')">🖼️ <span>Hình Ảnh Hoạt Động</span></button>
+            <button type="button" data-mobile-section="homework" onclick="mobileNavigate('homework')">📝 <span>Bài Tập Về Nhà</span></button>
+            <button type="button" data-mobile-section="results" onclick="mobileNavigate('results')">📊 <span>Kết Quả Kiểm Tra</span></button>
+            <button type="button" data-mobile-section="comments" onclick="mobileNavigate('comments')">💬 <span>Nhận Xét Giáo Viên</span></button>
+        </nav>
+        <div class="mobile-drawer-actions">
+            <button type="button" onclick="window.print()">🖨️ <span>In Báo Cáo / Lưu PDF</span></button>
+            <button type="button" onclick="logout()">↪️ <span>Đăng Xuất</span></button>
+        </div>
+    </aside>
+
 
     <!-- LIGHTBOX XEM ẢNH LỚN -->
     <div id="image-lightbox" class="hidden" onclick="closeLightbox()">
@@ -2693,6 +3091,88 @@
 
         populateDropdowns();
         initFirebaseListener();
-    </script>
+    
+        function toggleMobileMenu() {
+            document.body.classList.toggle('mobile-menu-open');
+        }
+
+        function closeMobileMenu() {
+            document.body.classList.remove('mobile-menu-open');
+        }
+
+        function mobileNavigate(section) {
+            closeMobileMenu();
+
+            const labels = {
+                overview: 'Tổng Quan',
+                history: 'Lịch Sử Học Tập',
+                lesson: 'Bài Học Trong Ngày',
+                gallery: 'Hình Ảnh Hoạt Động',
+                homework: 'Bài Tập Về Nhà',
+                results: 'Kết Quả Kiểm Tra',
+                comments: 'Nhận Xét Giáo Viên'
+            };
+
+            const wanted = labels[section];
+            const navEls = Array.from(document.querySelectorAll(
+                '.sidebar button, .sidebar a, nav button, nav a, .menu-item, [role="button"]'
+            ));
+
+            let target = navEls.find(el => {
+                const text = (el.innerText || el.textContent || '').trim();
+                return wanted && text.includes(wanted);
+            });
+
+            if (target) {
+                target.click();
+            } else {
+                const fallbackIds = {
+                    overview: ['student-dashboard', 'overview', 'home'],
+                    history: ['learning-history', 'history'],
+                    lesson: ['daily-lesson', 'lesson'],
+                    gallery: ['activity-gallery', 'gallery'],
+                    homework: ['homework', 'assignments'],
+                    results: ['test-results', 'results', 'scores'],
+                    comments: ['teacher-comments', 'comments']
+                }[section] || [];
+
+                target = fallbackIds.map(id => document.getElementById(id)).find(Boolean);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            updateMobileNavState(section);
+        }
+
+        function updateMobileNavState(section) {
+            document.querySelectorAll('[data-mobile-section]').forEach(el => {
+                el.classList.toggle('active', el.dataset.mobileSection === section);
+            });
+            document.querySelectorAll('[data-mobile-bottom]').forEach(el => {
+                el.classList.toggle('active', el.dataset.mobileBottom === section);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const possibleNames = [
+                document.getElementById('student-name')?.innerText,
+                document.getElementById('studentName')?.innerText,
+                document.querySelector('.student-name')?.innerText
+            ].filter(Boolean);
+
+            const drawerName = document.getElementById('mobile-drawer-student-name');
+            if (drawerName && possibleNames.length) drawerName.textContent = possibleNames[0].trim();
+
+            updateMobileNavState('overview');
+        });
+
+</script>
+
+    <nav class="mobile-bottom-nav" aria-label="Điều hướng nhanh">
+        <button type="button" data-mobile-bottom="overview" onclick="mobileNavigate('overview')"><span>🏠</span>Tổng quan</button>
+        <button type="button" data-mobile-bottom="lesson" onclick="mobileNavigate('lesson')"><span>📖</span>Bài học</button>
+        <button type="button" data-mobile-bottom="results" onclick="mobileNavigate('results')"><span>📊</span>Điểm số</button>
+        <button type="button" data-mobile-bottom="menu" onclick="toggleMobileMenu()"><span>☰</span>Menu</button>
+    </nav>
+
 </body>
 </html>
