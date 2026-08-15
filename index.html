@@ -39,7 +39,7 @@
             padding: 16px;
         }
 
-        .container { width: 100%; max-width: 1100px; margin: 0 auto; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; }
         .app-header { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
         .logo-area { display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .logo-icon { font-size: 1.8rem; background: var(--pastel-yellow); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; }
@@ -67,27 +67,42 @@
         
         .error-message { background: #fef2f2; color: #dc2626; padding: 12px; border-radius: 10px; font-size: 0.88rem; margin-top: 16px; border: 1px solid #fecaca; display: none; }
 
-        /* Report Header & Cards */
-        .report-header-card { 
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); 
-            border-radius: var(--border-radius); 
-            padding: 20px 24px; 
-            margin-bottom: 20px; 
-            border: 1px solid #bae6fd;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+        /* Report Dashboard Layout (Sidebar + Content) */
+        .dashboard-container {
+            background: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--shadow-soft);
+            border: 1px solid #e2e8f0; display: grid; grid-template-columns: 260px 1fr; overflow: hidden; margin-bottom: 30px;
         }
-        .student-info h2 { font-size: 1.75rem; color: #0369a1; margin-bottom: 8px; }
-        .meta-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-        .tag { background: #ffffff; padding: 6px 12px; border-radius: 16px; font-size: 0.82rem; font-weight: 700; color: #0284c7; border: 1px solid #bae6fd; }
 
+        .sidebar-menu {
+            background: #f8fafc; border-right: 1px solid #e2e8f0; padding: 24px 16px; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .student-mini-profile { text-align: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px dashed #cbd5e1; }
+        .student-mini-profile h2 { font-size: 1.3rem; color: #0369a1; margin-bottom: 4px; }
+
+        .menu-list { display: flex; flex-direction: column; gap: 6px; }
+        .menu-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; font-size: 0.9rem; font-weight: 700; color: #64748b; cursor: pointer; background: transparent; border: none; text-align: left; width: 100%; transition: all 0.2s;
+        }
+        .menu-item:hover { background: #f1f5f9; color: #0284c7; }
+        .menu-item.active { background: var(--pastel-blue); color: var(--pastel-blue-dark); }
+
+        .dashboard-main-content { padding: 24px; background: #ffffff; min-height: 550px; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .top-bar-content { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; }
         .date-selector-box {
-            background: #ffffff; padding: 8px 14px; border-radius: 12px; border: 1.5px solid #0284c7;
+            background: #f8fafc; padding: 6px 12px; border-radius: 10px; border: 1.5px solid #0284c7;
             display: flex; align-items: center; gap: 8px;
         }
-        .date-selector-box label { font-size: 0.85rem; font-weight: 700; color: #0369a1; }
-        .date-input { border: none; outline: none; background: transparent; font-size: 0.95rem; font-weight: 700; color: #1e293b; cursor: pointer; }
+        .date-selector-box label { font-size: 0.82rem; font-weight: 700; color: #0369a1; }
+        .date-input { border: none; outline: none; background: transparent; font-size: 0.9rem; font-weight: 700; color: #1e293b; cursor: pointer; }
 
-        .grid-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+        /* Lesson Details Grid */
+        .lesson-detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .lesson-card-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
+        .lesson-card-box h4 { font-size: 0.85rem; color: #64748b; margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
+        .lesson-card-box p { font-size: 1.05rem; font-weight: 700; color: #1e293b; }
+
+        .grid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
         .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 18px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; }
         .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; }
         .card-icon { font-size: 1.2rem; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
@@ -140,8 +155,7 @@
         #image-lightbox.hidden { display: none !important; }
 
         .hidden { display: none !important; }
-        @media (max-width: 900px) { .grid-cards { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .grid-cards { grid-template-columns: 1fr; } .report-header-card { flex-direction: column; align-items: flex-start; } }
+        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } .grid-cards { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -193,103 +207,202 @@
             </div>
         </section>
 
-        <!-- 2. MÀN HÌNH XEM BÁO CÁO HỌC SINH -->
+        <!-- 2. MÀN HÌNH XEM BÁO CÁO HỌC SINH (GIAO DIỆN SIDEBAR MỚI) -->
         <main id="report-view" class="hidden">
-            <div class="report-header-card">
-                <div class="student-info">
-                    <h2 id="display-student-name">Nguyễn Minh Anh</h2>
-                    <div class="meta-tags">
-                        <span class="tag" id="display-class">Lớp: Pre-Starters</span>
-                    </div>
-                </div>
-
-                <div class="date-selector-box">
-                    <label for="report-month-picker">📅 Lọc theo Tháng/Năm:</label>
-                    <input type="month" id="report-month-picker" class="date-input" onchange="onStudentMonthChange(this.value)">
-                </div>
-            </div>
-
-            <!-- NỘI DUNG LỊCH ĐIỂM DANH & HÌNH ẢNH HOẠT ĐỘNG LỚP -->
-            <div class="card" style="margin-bottom: 20px;">
-                <h3 style="margin-bottom: 12px; color: var(--pastel-blue-dark); display: flex; align-items: center; gap: 8px;">
-                    🗓️ Lịch Sử Điểm Danh, BTVN & Hình Ảnh Lớp Trong Tháng (<span id="display-selected-month">08/2026</span>)
-                </h3>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Ngày Học</th>
-                                <th>Buổi Học</th>
-                                <th>Điểm Danh</th>
-                                <th>Bài Tập Về Nhà</th>
-                                <th>📸 Hình Ảnh Hoạt Động (Bấm xem lớn)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-attendance-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ĐIỂM KIỂM TRA -->
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                <h3 style="color: #334155;">📊 Kết Quả Kiểm Tra Chi Tiết</h3>
-                <div id="student-exam-selector-box"></div>
-            </div>
-            
-            <div class="grid-cards">
-                <div class="card card-avg">
-                    <div class="card-header">
-                        <div class="card-icon icon-yellow">⭐</div>
-                        <div>
-                            <h3 style="font-size: 0.95rem; color: #854d0e;">Điểm Trung Bình</h3>
-                            <span style="font-size: 0.75rem; color: #a16207; font-weight:bold;">Overall Score</span>
+            <div class="dashboard-container">
+                <!-- SIDEBAR MENU BÊN TRÁI -->
+                <div class="sidebar-menu">
+                    <div>
+                        <div class="student-mini-profile">
+                            <h2 id="display-student-name">Mia</h2>
+                            <span class="tag" id="display-class">Lớp: Pre-Starters</span>
+                        </div>
+                        <div class="menu-list">
+                            <button class="menu-item active" id="menu-overview" onclick="switchStudentTab('overview')">🏠 Tổng Quan</button>
+                            <button class="menu-item" id="menu-attendance" onclick="switchStudentTab('attendance')">📅 Lịch Sử Học Tập</button>
+                            <button class="menu-item" id="menu-lesson" onclick="switchStudentTab('lesson')">📖 Bài Học Trong Ngày</button>
+                            <button class="menu-item" id="menu-gallery" onclick="switchStudentTab('gallery')">🖼️ Hình Ảnh Hoạt Động</button>
+                            <button class="menu-item" id="menu-homework" onclick="switchStudentTab('homework')">📝 Bài Tập Về Nhà</button>
+                            <button class="menu-item" id="menu-scores" onclick="switchStudentTab('scores')">📊 Kết Quả Kiểm Tra</button>
+                            <button class="menu-item" id="menu-comment" onclick="switchStudentTab('comment')">💬 Nhận Xét Giáo Viên</button>
                         </div>
                     </div>
-                    <div class="score-box"><span class="score-value" id="avg-score" style="color: #854d0e;">-</span><span class="score-max" style="color: #a16207;">/ 10</span></div>
+
+                    <div style="margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+                        <button class="btn-secondary" style="font-size:0.82rem; width:100%;" onclick="window.print()">🖨️ In Báo Cáo / Lưu PDF</button>
+                        <button class="btn-secondary" style="font-size:0.82rem; width:100%;" onclick="showLogin()">↩️ Đăng Xuất</button>
+                    </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-icon icon-blue">🎧</div>
-                        <div>
-                            <h3 style="font-size: 0.95rem;">Kỹ Năng Nghe</h3>
-                            <span style="font-size: 0.75rem; color: var(--text-muted);">Listening</span>
+                <!-- MAIN CONTENT BÊN PHẢI -->
+                <div class="dashboard-main-content">
+                    <div>
+                        <div class="top-bar-content">
+                            <div>
+                                <h3 id="content-section-title" style="color: #0369a1; font-size: 1.25rem;">🏠 Tổng Quan Thông Tin Học Sinh</h3>
+                            </div>
+                            <div class="date-selector-box">
+                                <label for="report-month-picker">📅 Lọc theo Tháng:</label>
+                                <input type="month" id="report-month-picker" class="date-input" onchange="onStudentMonthChange(this.value)">
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: 1. TỔNG QUAN -->
+                        <div id="student-tab-overview" class="student-sub-tab">
+                            <div class="lesson-detail-grid">
+                                <div class="lesson-card-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);">
+                                    <h4>Trạng thái học tập</h4>
+                                    <p style="color: #0284c7;">Đang theo học đều đặn & chuyên cần</p>
+                                </div>
+                                <div class="lesson-card-box" style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);">
+                                    <h4>Điểm trung bình gần nhất</h4>
+                                    <p id="overview-avg-score" style="color: #ca8a04;">- / 10</p>
+                                </div>
+                            </div>
+                            <div class="card" style="border-left: 5px solid var(--pastel-blue-dark);">
+                                <h4 style="margin-bottom: 8px; color: var(--pastel-blue-dark);">💡 Hướng Dẫn Xem Báo Cáo</h4>
+                                <p style="font-size: 0.9rem; line-height: 1.6; color: #475569;">
+                                    Ba mẹ và bé có thể bấm chọn các mục ở thanh menu bên trái để xem chi tiết lịch sử học tập, bài học từng buổi, hình ảnh hoạt động trên lớp, điểm số kiểm tra cũng như nhận xét chi tiết từ giáo viên nhé!
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: 2. LỊCH SỬ HỌC TẬP (ĐIỂM DANH) -->
+                        <div id="student-tab-attendance" class="student-sub-tab hidden">
+                            <h4 style="margin-bottom: 12px; color: #334155;">🗓️ Bảng Điểm Danh & Chuyên Cần Trong Tháng</h4>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Ngày Học</th>
+                                            <th>Buổi Học</th>
+                                            <th>Điểm Danh (Có mặt/Vắng/Trễ)</th>
+                                            <th>Bài Tập Về Nhà</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="report-attendance-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: 3. BÀI HỌC TRONG NGÀY -->
+                        <div id="student-tab-lesson" class="student-sub-tab hidden">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                                <h4 style="color: #334155;">📚 Chi Tiết Bài Học Theo Buổi</h4>
+                                <div id="lesson-date-selector-container"></div>
+                            </div>
+                            <div class="lesson-detail-grid">
+                                <div class="lesson-card-box">
+                                    <h4>Chủ Đề (Topic)</h4>
+                                    <p id="lesson-topic-val">Animals</p>
+                                </div>
+                                <div class="lesson-card-box">
+                                    <h4>Từ Vựng (Vocabulary)</h4>
+                                    <p id="lesson-vocab-val">dog, cat, rabbit, bird, fish</p>
+                                </div>
+                                <div class="lesson-card-box">
+                                    <h4>Ngữ Pháp (Grammar)</h4>
+                                    <p id="lesson-grammar-val">This is a... / I have...</p>
+                                </div>
+                                <div class="lesson-card-box">
+                                    <h4>Hoạt Động (Activities)</h4>
+                                    <p id="lesson-activities-val">Flashcards, Speaking Game, Worksheet</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: 4. HÌNH ẢNH HOẠT ĐỘNG LỚP -->
+                        <div id="student-tab-gallery" class="student-sub-tab hidden">
+                            <h4 style="margin-bottom: 12px; color: #334155;">📸 Khoảnh Khắc Hoạt Động Của Lớp (Bấm vào ảnh để phóng to)</h4>
+                            <div id="student-gallery-container">
+                                <i>Chưa có hình ảnh hoạt động nào trong tháng này.</i>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: 5. BÀI TẬP VỀ NHÀ -->
+                        <div id="student-tab-homework" class="student-sub-tab hidden">
+                            <h4 style="margin-bottom: 12px; color: #334155;">📝 Tình Hình Hoàn Thành Bài Tập Về Nhà</h4>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Ngày Học</th>
+                                            <th>Buổi Học</th>
+                                            <th>Trạng Thái Nộp BTVN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="report-homework-tbody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: 6. KẾT QUẢ KIỂM TRA -->
+                        <div id="student-tab-scores" class="student-sub-tab hidden">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px;">
+                                <h4 style="color: #334155;">📊 Kết Quả Kiểm Tra Chi Tiết</h4>
+                                <div id="student-exam-selector-box"></div>
+                            </div>
+                            
+                            <div class="grid-cards">
+                                <div class="card card-avg">
+                                    <div class="card-header">
+                                        <div class="card-icon icon-yellow">⭐</div>
+                                        <div>
+                                            <h3 style="font-size: 0.95rem; color: #854d0e;">Điểm Trung Bình</h3>
+                                            <span style="font-size: 0.75rem; color: #a16207; font-weight:bold;">Overall Score</span>
+                                        </div>
+                                    </div>
+                                    <div class="score-box"><span class="score-value" id="avg-score" style="color: #854d0e;">-</span><span class="score-max" style="color: #a16207;">/ 10</span></div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-icon icon-blue">🎧</div>
+                                        <div>
+                                            <h3 style="font-size: 0.95rem;">Kỹ Năng Nghe</h3>
+                                            <span style="font-size: 0.75rem; color: var(--text-muted);">Listening</span>
+                                        </div>
+                                    </div>
+                                    <div class="score-box"><span class="score-value" id="lis-score">-</span><span class="score-max">/ 10</span></div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-icon icon-pink">📖</div>
+                                        <div>
+                                            <h3 style="font-size: 0.95rem;">Đọc & Viết</h3>
+                                            <span style="font-size: 0.75rem; color: var(--text-muted);">Reading & Writing</span>
+                                        </div>
+                                    </div>
+                                    <div class="score-box"><span class="score-value" id="rw-score">-</span><span class="score-max">/ 10</span></div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-icon icon-purple">🗣️</div>
+                                        <div>
+                                            <h3 style="font-size: 0.95rem;">Kỹ Năng Nói</h3>
+                                            <span style="font-size: 0.75rem; color: var(--text-muted);">Speaking</span>
+                                        </div>
+                                    </div>
+                                    <div class="score-box"><span class="score-value" id="spk-score">-</span><span class="score-max">/ 10</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB CONTENT: 7. NHẬN XÉT GIÁO VIÊN -->
+                        <div id="student-tab-comment" class="student-sub-tab hidden">
+                            <div class="card" style="border-left: 5px solid var(--pastel-purple-dark);">
+                                <h4 style="margin-bottom: 8px; color: var(--pastel-purple-dark);">💬 Nhận Xét Đánh Giá Từ Giáo Viên</h4>
+                                <p id="teacher-main-comment" style="line-height: 1.6; color: #334155;">Chưa có nhận xét.</p>
+                            </div>
                         </div>
                     </div>
-                    <div class="score-box"><span class="score-value" id="lis-score">-</span><span class="score-max">/ 10</span></div>
-                </div>
 
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-icon icon-pink">📖</div>
-                        <div>
-                            <h3 style="font-size: 0.95rem;">Đọc & Viết</h3>
-                            <span style="font-size: 0.75rem; color: var(--text-muted);">Reading & Writing</span>
-                        </div>
+                    <div style="margin-top: 24px; text-align: right; color: var(--text-muted); font-size: 0.8rem;">
+                        Hệ thống Quản lý học tập học sinh • Hanna English Class
                     </div>
-                    <div class="score-box"><span class="score-value" id="rw-score">-</span><span class="score-max">/ 10</span></div>
                 </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-icon icon-purple">🗣️</div>
-                        <div>
-                            <h3 style="font-size: 0.95rem;">Kỹ Năng Nói</h3>
-                            <span style="font-size: 0.75rem; color: var(--text-muted);">Speaking</span>
-                        </div>
-                    </div>
-                    <div class="score-box"><span class="score-value" id="spk-score">-</span><span class="score-max">/ 10</span></div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-bottom: 20px; border-left: 5px solid var(--pastel-purple-dark);">
-                <h3 style="margin-bottom: 8px;">💬 Nhận Xét Chi Tiết Của Giáo Viên</h3>
-                <p id="teacher-main-comment" style="line-height: 1.6; color: #334155;">Chưa có nhận xét.</p>
-            </div>
-
-            <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 30px;">
-                <button class="btn-secondary" onclick="window.print()">🖨️ In Báo Cáo / Lưu PDF</button>
-                <button class="btn-secondary" onclick="showLogin()">↩️ Đăng Xuất</button>
             </div>
         </main>
 
@@ -302,7 +415,7 @@
                 </div>
 
                 <div class="tab-bar">
-                    <button class="tab-btn active" id="tab-btn-att" onclick="switchAdminTab('attendance')">1. Quản Lý Điểm Danh & Ảnh Lớp</button>
+                    <button class="tab-btn active" id="tab-btn-att" onclick="switchAdminTab('attendance')">1. Điểm Danh, Bài Học & Ảnh Lớp</button>
                     <button class="tab-btn" id="tab-btn-scores" onclick="switchAdminTab('scores')">2. Điểm Kiểm Tra & Nhận Xét</button>
                     <button class="tab-btn" id="tab-btn-students" onclick="switchAdminTab('students')">3. Quản Lý Danh Sách Lớp</button>
                 </div>
@@ -315,16 +428,16 @@
                     </div>
 
                     <div style="font-size:0.85rem; color:var(--text-muted);">
-                        💡 Chọn bài test ở mục Thao Tác hoặc thêm bài mới bên dưới.
+                        💡 Chọn ngày học bên dưới để nhập Bài học, Điểm danh và Tải ảnh lên.
                     </div>
                 </div>
 
-                <!-- TAB 1: ĐIỂM DANH & UPLOAD ẢNH THEO LỊCH CỤ THỂ -->
+                <!-- TAB 1: ĐIỂM DANH, BÀI HỌC & UPLOAD ẢNH THEO LỊCH CỤ THỂ -->
                 <div id="admin-tab-att">
                     <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <label style="font-weight: 700; color: #7e22ce;">🗓️ Chọn Ngày Học Lớp Này:</label>
-                            <input type="date" id="admin-date-picker" class="form-control" style="font-weight: 700; border-color: #7e22ce;">
+                            <input type="date" id="admin-date-picker" class="form-control" style="font-weight: 700; border-color: #7e22ce;" onchange="onAdminDateSelected()">
                         </div>
 
                         <div style="display: flex; gap: 8px;">
@@ -332,6 +445,31 @@
                         </div>
                     </div>
 
+                    <!-- KHUNG NHẬP BÀI HỌC TRONG NGÀY (CHỦ ĐỀ, TỪ VỰNG, NGỮ PHÁP, HOẠT ĐỘNG) -->
+                    <div class="card" style="margin-bottom: 20px; border-left: 5px solid #0284c7; background: #f8fafc;">
+                        <h3 style="margin-bottom: 12px; color: #0369a1; font-size: 1rem;">📖 Cập Nhật Bài Học Trong Ngày (<span id="admin-selected-date-label">--/--/----</span>)</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Chủ Đề (Topic)</label>
+                                <input type="text" id="lesson-topic-input" class="form-control" placeholder="Ví dụ: Animals, Toys...">
+                            </div>
+                            <div class="form-group">
+                                <label>Từ Vựng (Vocabulary)</label>
+                                <input type="text" id="lesson-vocab-input" class="form-control" placeholder="Ví dụ: dog, cat, rabbit...">
+                            </div>
+                            <div class="form-group">
+                                <label>Ngữ Pháp (Grammar)</label>
+                                <input type="text" id="lesson-grammar-input" class="form-control" placeholder="Ví dụ: This is a... / I have...">
+                            </div>
+                            <div class="form-group">
+                                <label>Hoạt Động (Activities)</label>
+                                <input type="text" id="lesson-act-input" class="form-control" placeholder="Ví dụ: Flashcards, Speaking Game...">
+                            </div>
+                        </div>
+                        <button class="btn-success" onclick="saveLessonDetails()">💾 Lưu Bài Học Ngày Này</button>
+                    </div>
+
+                    <div style="margin-bottom: 12px; font-weight: 700; color: #334155;">📋 Điểm Danh & Tải Hình Ảnh Buổi Học Lên:</div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -524,6 +662,12 @@
             "Movers": ["2026-08-03", "2026-08-10"]
         };
 
+        const DEFAULT_LESSON_DETAILS = {
+            "Pre-Starters": {
+                "2026-08-15": { topic: "Animals", vocab: "dog, cat, rabbit, bird, fish", grammar: "This is a... / I have...", activities: "Flashcards, Speaking Game, Worksheet" }
+            }
+        };
+
         const DEFAULT_DATA = [
             { 
                 id: "1", 
@@ -548,14 +692,18 @@
 
         let classList = DEFAULT_CLASSES;
         let classDatesMap = DEFAULT_CLASS_DATES;
+        let lessonDetailsMap = DEFAULT_LESSON_DETAILS;
         let studentsData = DEFAULT_DATA;
         let classImagesMap = {}; 
         let editingExamIndex = -1;
+        let currentStudentTab = 'overview';
+        let studentSelectedLessonDate = '';
 
         function saveData() {
             db.ref('app_data').set({
                 classList: classList,
                 classDatesMap: classDatesMap,
+                lessonDetailsMap: lessonDetailsMap,
                 studentsData: studentsData,
                 classImagesMap: classImagesMap
             });
@@ -567,6 +715,7 @@
                 if (data) {
                     if (data.classList) classList = data.classList;
                     if (data.classDatesMap) classDatesMap = data.classDatesMap;
+                    if (data.lessonDetailsMap) lessonDetailsMap = data.lessonDetailsMap;
                     if (data.studentsData) {
                         studentsData = data.studentsData;
                     } else {
@@ -653,6 +802,7 @@
             selectedStudentMonth = `${yyyy}-${mm}`;
             document.getElementById('report-month-picker').value = selectedStudentMonth;
 
+            switchStudentTab('overview');
             renderStudentReport();
         }
 
@@ -666,11 +816,49 @@
             document.getElementById('admin-date-picker').value = today;
             document.getElementById('form-exam-date').value = today;
 
+            onAdminDateSelected();
             renderAdminViews();
         }
 
         function onAdminFilterChange() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dates = getClassDates(currentClass);
+            if (dates.length > 0) {
+                document.getElementById('admin-date-picker').value = dates[0];
+            }
+            onAdminDateSelected();
             renderAdminViews();
+        }
+
+        function onAdminDateSelected() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            document.getElementById('admin-selected-date-label').innerText = formatDateVN(dateStr);
+
+            if (!lessonDetailsMap[currentClass]) lessonDetailsMap[currentClass] = {};
+            const details = lessonDetailsMap[currentClass][dateStr] || { topic: "", vocab: "", grammar: "", activities: "" };
+
+            document.getElementById('lesson-topic-input').value = details.topic || "";
+            document.getElementById('lesson-vocab-input').value = details.vocab || "";
+            document.getElementById('lesson-grammar-input').value = details.grammar || "";
+            document.getElementById('lesson-act-input').value = details.activities || "";
+        }
+
+        function saveLessonDetails() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            if (!dateStr) { alert("Vui lòng chọn ngày học!"); return; }
+
+            if (!lessonDetailsMap[currentClass]) lessonDetailsMap[currentClass] = {};
+            lessonDetailsMap[currentClass][dateStr] = {
+                topic: document.getElementById('lesson-topic-input').value,
+                vocab: document.getElementById('lesson-vocab-input').value,
+                grammar: document.getElementById('lesson-grammar-input').value,
+                activities: document.getElementById('lesson-act-input').value
+            };
+
+            saveData();
+            alert(`Đã lưu thông tin bài học ngày ${formatDateVN(dateStr)} thành công! 🎉`);
         }
 
         function renderAdminViews() {
@@ -703,13 +891,6 @@
             renderStudentReport();
         }
 
-        function changeStudentReportExam(examIdx) {
-            if (currentStudent) {
-                currentStudent.selectedExamIdx = parseInt(examIdx);
-                renderStudentReport();
-            }
-        }
-
         function openLightbox(imgUrl) {
             document.getElementById('lightbox-img').src = imgUrl;
             document.getElementById('image-lightbox').classList.remove('hidden');
@@ -719,53 +900,106 @@
             document.getElementById('image-lightbox').classList.add('hidden');
         }
 
+        function switchStudentTab(tabName) {
+            currentStudentTab = tabName;
+            const tabs = ['overview', 'attendance', 'lesson', 'gallery', 'homework', 'scores', 'comment'];
+            
+            tabs.forEach(t => {
+                const btn = document.getElementById(`menu-${t}`);
+                const content = document.getElementById(`student-tab-${t}`);
+                if (btn) btn.classList.toggle('active', t === tabName);
+                if (content) content.classList.toggle('hidden', t !== tabName);
+            });
+
+            const titles = {
+                overview: "🏠 Tổng Quan Thông Tin Học Sinh",
+                attendance: "📅 Lịch Sử Học Tập & Điểm Danh",
+                lesson: "📖 Bài Học Trong Ngày",
+                gallery: "🖼️ Hình Ảnh Hoạt Động Lớp",
+                homework: "📝 Bài Tập Về Nhà",
+                scores: "📊 Kết Quả Kiểm Tra Chi Tiết",
+                comment: "💬 Nhận Xét Của Giáo Viên"
+            };
+            document.getElementById('content-section-title').innerText = titles[tabName] || "";
+            if (tabName === 'lesson') renderStudentLessonTab();
+        }
+
         function renderStudentReport() {
             document.getElementById('display-student-name').innerText = currentStudent.name;
             document.getElementById('display-class').innerText = `Lớp: ${currentStudent.className}`;
-            
-            const [y, m] = selectedStudentMonth.split('-');
-            document.getElementById('display-selected-month').innerText = `Tháng ${m}/${y}`;
 
             const classDates = getClassDates(currentStudent.className);
             const monthDates = classDates.filter(d => d.startsWith(selectedStudentMonth));
-            const attTbody = document.getElementById('report-attendance-tbody');
 
+            // 1. Attendance Table
+            const attTbody = document.getElementById('report-attendance-tbody');
             if (monthDates.length === 0) {
-                attTbody.innerHTML = `<tr><td colspan="5"><i>Không có lịch học nào trong tháng ${m}/${y}!</i></td></tr>`;
+                attTbody.innerHTML = `<tr><td colspan="4"><i>Không có lịch học nào trong tháng này!</i></td></tr>`;
             } else {
                 attTbody.innerHTML = monthDates.map((dateStr, idx) => {
                     const rec = (currentStudent.attendanceByDate && currentStudent.attendanceByDate[dateStr]) || { att: "Có mặt", hw: "Hoàn thành" };
-                    
-                    const imgs = (classImagesMap[currentStudent.className] && classImagesMap[currentStudent.className][dateStr]) || [];
-                    let imgHtml = '<span style="color:#94a3b8; font-size:0.8rem;">Chưa có ảnh</span>';
-                    if (imgs.length > 0) {
-                        imgHtml = `<div class="activity-gallery-grid">` + imgs.map(url => `
-                            <div class="activity-thumb-wrap">
-                                <img src="${url}" class="activity-thumb" onclick="openLightbox('${url}')" title="Bấm để xem ảnh lớn">
-                            </div>
-                        `).join('') + `</div>`;
-                    }
-
                     return `
                         <tr>
                             <td><b>${formatDateVN(dateStr)}</b></td>
                             <td>Buổi ${idx + 1}</td>
-                            <td>
-                                <span class="badge ${rec.att === 'Có mặt' ? 'badge-success' : (rec.att === 'Đi trễ' ? 'badge-warning' : 'badge-danger')}">
-                                    ${rec.att}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge ${rec.hw === 'Hoàn thành' ? 'badge-success' : (rec.hw === 'Nộp trễ' ? 'badge-warning' : 'badge-danger')}">
-                                    ${rec.hw}
-                                </span>
-                            </td>
-                            <td>${imgHtml}</td>
+                            <td><span class="badge ${rec.att === 'Có mặt' ? 'badge-success' : (rec.att === 'Đi trễ' ? 'badge-warning' : 'badge-danger')}">${rec.att}</span></td>
+                            <td><span class="badge ${rec.hw === 'Hoàn thành' ? 'badge-success' : (rec.hw === 'Nộp trễ' ? 'badge-warning' : 'badge-danger')}">${rec.hw}</span></td>
                         </tr>
                     `;
                 }).join('');
             }
 
+            // 2. Homework Table
+            const hwTbody = document.getElementById('report-homework-tbody');
+            if (monthDates.length === 0) {
+                hwTbody.innerHTML = `<tr><td colspan="3"><i>Không có dữ liệu bài tập.</i></td></tr>`;
+            } else {
+                hwTbody.innerHTML = monthDates.map((dateStr, idx) => {
+                    const rec = (currentStudent.attendanceByDate && currentStudent.attendanceByDate[dateStr]) || { hw: "Hoàn thành" };
+                    return `
+                        <tr>
+                            <td><b>${formatDateVN(dateStr)}</b></td>
+                            <td>Buổi ${idx + 1}</td>
+                            <td><span class="badge ${rec.hw === 'Hoàn thành' ? 'badge-success' : (rec.hw === 'Nộp trễ' ? 'badge-warning' : 'badge-danger')}">${rec.hw}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // 3. Lesson Tab Setup
+            const lessonSelectorContainer = document.getElementById('lesson-date-selector-container');
+            if (monthDates.length > 0) {
+                if (!monthDates.includes(studentSelectedLessonDate)) {
+                    studentSelectedLessonDate = monthDates[0];
+                }
+                lessonSelectorContainer.innerHTML = `
+                    <select onchange="changeStudentLessonDate(this.value)" class="form-control" style="font-size:0.85rem; font-weight:700;">
+                        ${monthDates.map(d => `<option value="${d}" ${d === studentSelectedLessonDate ? 'selected' : ''}>${formatDateVN(d)}</option>`).join('')}
+                    </select>
+                `;
+            } else {
+                lessonSelectorContainer.innerHTML = '';
+                studentSelectedLessonDate = '';
+            }
+            renderStudentLessonContent();
+
+            // 4. Gallery Tab Setup
+            const galleryContainer = document.getElementById('student-gallery-container');
+            let allImgsHtml = '';
+            monthDates.forEach(dateStr => {
+                const imgs = (classImagesMap[currentStudent.className] && classImagesMap[currentStudent.className][dateStr]) || [];
+                if (imgs.length > 0) {
+                    allImgsHtml += `<div style="margin-bottom:12px;"><b style="font-size:0.85rem; color:#0284c7;">📅 Ngày ${formatDateVN(dateStr)}:</b>`;
+                    allImgsHtml += `<div class="activity-gallery-grid">` + imgs.map(url => `
+                        <div class="activity-thumb-wrap">
+                            <img src="${url}" class="activity-thumb" onclick="openLightbox('${url}')" title="Bấm xem lớn">
+                        </div>
+                    `).join('') + `</div></div>`;
+                }
+            });
+            galleryContainer.innerHTML = allImgsHtml || '<i>Chưa có hình ảnh hoạt động nào trong tháng này.</i>';
+
+            // 5. Scores & Comments
             const reports = currentStudent.examReports || [];
             const selectorContainer = document.getElementById('student-exam-selector-box');
             
@@ -789,7 +1023,9 @@
                 document.getElementById('lis-score').innerText = currentExam.skills.lis;
                 document.getElementById('rw-score').innerText = currentExam.skills.rw;
                 document.getElementById('spk-score').innerText = currentExam.skills.spk;
-                document.getElementById('avg-score').innerText = calcAverage(currentExam.skills);
+                const avg = calcAverage(currentExam.skills);
+                document.getElementById('avg-score').innerText = avg;
+                document.getElementById('overview-avg-score').innerText = `${avg} / 10`;
                 document.getElementById('teacher-main-comment').innerText = `${currentExam.examName} (${formatDateVN(currentExam.date)}): ${currentExam.mainComment || 'Không có nhận xét thêm.'}`;
             } else {
                 selectorContainer.innerHTML = '';
@@ -797,7 +1033,42 @@
                 document.getElementById('rw-score').innerText = '-';
                 document.getElementById('spk-score').innerText = '-';
                 document.getElementById('avg-score').innerText = '-';
+                document.getElementById('overview-avg-score').innerText = '- / 10';
                 document.getElementById('teacher-main-comment').innerText = 'Chưa có bài kiểm tra nào được ghi nhận.';
+            }
+        }
+
+        function changeStudentLessonDate(dateStr) {
+            studentSelectedLessonDate = dateStr;
+            renderStudentLessonContent();
+        }
+
+        function renderStudentLessonContent() {
+            if (!studentSelectedLessonDate) {
+                document.getElementById('lesson-topic-val').innerText = "Chưa có dữ liệu";
+                document.getElementById('lesson-vocab-val').innerText = "Chưa có dữ liệu";
+                document.getElementById('lesson-grammar-val').innerText = "Chưa có dữ liệu";
+                document.getElementById('lesson-activities-val').innerText = "Chưa có dữ liệu";
+                return;
+            }
+
+            const classLessons = lessonDetailsMap[currentStudent.className] || {};
+            const lesson = classLessons[studentSelectedLessonDate] || { topic: "Chưa cập nhật", vocab: "Chưa cập nhật", grammar: "Chưa cập nhật", activities: "Chưa cập nhật" };
+
+            document.getElementById('lesson-topic-val').innerText = lesson.topic || "Chưa cập nhật";
+            document.getElementById('lesson-vocab-val').innerText = lesson.vocab || "Chưa cập nhật";
+            document.getElementById('lesson-grammar-val').innerText = lesson.grammar || "Chưa cập nhật";
+            document.getElementById('lesson-activities-val').innerText = lesson.activities || "Chưa cập nhật";
+        }
+
+        function renderStudentLessonTab() {
+            renderStudentLessonContent();
+        }
+
+        function changeStudentReportExam(examIdx) {
+            if (currentStudent) {
+                currentStudent.selectedExamIdx = parseInt(examIdx);
+                renderStudentReport();
             }
         }
 
@@ -816,11 +1087,12 @@
             const currentClass = document.getElementById('admin-class-filter').value;
             const filteredStudents = studentsData.filter(s => s.className === currentClass);
             const classDates = getClassDates(currentClass);
+            const activeDate = document.getElementById('admin-date-picker').value;
 
             const headerRow = document.getElementById('att-table-header');
             headerRow.innerHTML = `<th>STT</th><th>Họ và Tên Học Sinh</th>` + 
                 classDates.map((dateStr, idx) => `
-                    <th style="background: #f1f5f9;">
+                    <th style="background: ${dateStr === activeDate ? '#e0f2fe' : '#f8fafc'};">
                         <div style="cursor: pointer; color: #0284c7; font-weight: 700; margin-bottom: 6px;" title="Xóa ngày học này" onclick="deleteOrEditDate('${currentClass}', ${idx})">📅 ${formatDateVN(dateStr)} <span style="font-size: 0.7rem; color: #ef4444;">(Xóa)</span></div>
                         <div style="margin-top: 6px;">
                             <!-- DÙNG FILE INPUT ĐỂ CHỌN ẢNH TRỰC TIẾP TỪ MÁY -->
@@ -961,6 +1233,7 @@
             dates.sort();
             saveData();
             renderAdminAttTable();
+            onAdminDateSelected();
             alert(`Đã thêm ngày học ${formatDateVN(dateInputVal)} cho lớp ${currentClass}!`);
         }
 
@@ -1308,6 +1581,7 @@
                 studentsData = [];
                 classList = DEFAULT_CLASSES;
                 classDatesMap = DEFAULT_CLASS_DATES;
+                lessonDetailsMap = DEFAULT_LESSON_DETAILS;
                 classImagesMap = {};
                 saveData();
                 populateDropdowns();
