@@ -7,6 +7,7 @@
     <!-- Firebase SDK (Version 9 Compatibility) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
     
     <style>
         :root {
@@ -105,6 +106,149 @@
         .overview-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
 
         .grid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+        .lesson-resource-upload-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin: 16px 0 12px;
+        }
+
+        .lesson-resource-box {
+            background: #fff;
+            border: 1px dashed #bfdbfe;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .lesson-resource-box label {
+            display: block;
+            font-weight: 800;
+            color: #0369a1;
+            margin-bottom: 7px;
+        }
+
+        .lesson-resource-box small {
+            display: block;
+            margin-top: 6px;
+            color: #64748b;
+            line-height: 1.45;
+        }
+
+        .lesson-resource-existing {
+            margin: 10px 0 14px;
+        }
+
+        .lesson-resource-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .lesson-resource-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #f8fafc;
+            border: 1px solid #dbeafe;
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: .84rem;
+        }
+
+        .lesson-resource-chip button {
+            border: 0;
+            background: transparent;
+            color: #dc2626;
+            cursor: pointer;
+            font-weight: 800;
+            padding: 2px 4px;
+        }
+
+        .lesson-student-resources {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .lesson-resource-student-card {
+            background: #f8fafc;
+            border: 1px solid #dbe5ef;
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .lesson-resource-student-card h4 {
+            margin: 0 0 10px;
+            color: #0369a1;
+        }
+
+        .lesson-resource-image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .lesson-resource-image-grid img {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #dbe5ef;
+            cursor: pointer;
+        }
+
+        .lesson-resource-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 10px;
+            border-radius: 10px;
+            background: #fff;
+            border: 1px solid #dbe5ef;
+            color: #0369a1;
+            font-weight: 700;
+            text-decoration: none;
+            overflow-wrap: anywhere;
+        }
+
+        .lesson-resource-link:hover {
+            background: #eff6ff;
+        }
+
+        .lesson-resource-empty {
+            color: #64748b;
+            font-size: .85rem;
+        }
+
+        .teacher-comment-card {
+            grid-column: 1 / -1;
+            border-left: 5px solid var(--pastel-purple-dark);
+            background: #faf7ff;
+            margin-top: 0;
+        }
+
+        .teacher-comment-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .teacher-comment-content {
+            border-top: 1px dashed #ddd6fe;
+            padding-top: 12px;
+        }
+
+        .teacher-comment-content p {
+            margin: 0;
+            line-height: 1.65;
+            color: #334155;
+            font-size: 0.92rem;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
         .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 18px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; }
         .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; }
         .card-icon { font-size: 1.2rem; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
@@ -414,6 +558,25 @@
             .card-header { margin-bottom: 8px; }
             .score-value { font-size: 1.55rem; }
 
+            .teacher-comment-card {
+                margin-top: 0;
+                padding: 13px;
+            }
+
+            .lesson-resource-upload-grid,
+            .lesson-student-resources {
+                grid-template-columns: 1fr;
+            }
+
+            .lesson-resource-image-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .teacher-comment-content p {
+                font-size: .86rem;
+                line-height: 1.55;
+            }
+
             .student-sub-tab h4 {
                 font-size: .88rem;
                 line-height: 1.4;
@@ -719,7 +882,6 @@
                             <button class="menu-item" id="menu-gallery" onclick="switchStudentTab('gallery')">🖼️ Hình Ảnh Hoạt Động</button>
                             <button class="menu-item" id="menu-homework" onclick="switchStudentTab('homework')">📝 Bài Tập Về Nhà</button>
                             <button class="menu-item" id="menu-scores" onclick="switchStudentTab('scores')">📊 Kết Quả Kiểm Tra</button>
-                            <button class="menu-item" id="menu-comment" onclick="switchStudentTab('comment')">💬 Nhận Xét Giáo Viên</button>
                         </div>
                     </div>
 
@@ -812,6 +974,23 @@
                                     <p id="lesson-activities-val">Flashcards, Speaking Game, Worksheet</p>
                                 </div>
                             </div>
+
+                            <div id="student-lesson-resources" class="lesson-student-resources">
+                                <div class="lesson-resource-student-card hidden" id="student-lesson-images-card">
+                                    <h4>🖼️ Hình Ảnh Bài Học</h4>
+                                    <div id="student-lesson-images"></div>
+                                </div>
+
+                                <div class="lesson-resource-student-card hidden" id="student-lesson-audio-card">
+                                    <h4>🎧 Link Nghe</h4>
+                                    <div id="student-lesson-audio"></div>
+                                </div>
+
+                                <div class="lesson-resource-student-card hidden" id="student-lesson-documents-card">
+                                    <h4>📎 Tài Liệu Bài Học</h4>
+                                    <div id="student-lesson-documents"></div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- TAB CONTENT: 4. HÌNH ẢNH HOẠT ĐỘNG LỚP -->
@@ -891,13 +1070,19 @@
                                     <div class="score-box"><span class="score-value" id="spk-score">-</span><span class="score-max">/ 10</span></div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- TAB CONTENT: 7. NHẬN XÉT GIÁO VIÊN -->
-                        <div id="student-tab-comment" class="student-sub-tab hidden">
-                            <div class="card" style="border-left: 5px solid var(--pastel-purple-dark);">
-                                <h4 style="margin-bottom: 8px; color: var(--pastel-purple-dark);">💬 Nhận Xét Đánh Giá Từ Giáo Viên</h4>
-                                <p id="teacher-main-comment" style="line-height: 1.6; color: #334155;">Chưa có nhận xét.</p>
+                            <!-- NHẬN XÉT GIÁO VIÊN: HIỂN THỊ NGAY TRONG PHẦN ĐIỂM -->
+                            <div class="card teacher-comment-card">
+                                <div class="teacher-comment-header">
+                                    <div class="card-icon icon-purple">💬</div>
+                                    <div>
+                                        <h3 style="font-size: 0.98rem; color: var(--pastel-purple-dark);">Nhận Xét Của Giáo Viên</h3>
+                                        <span style="font-size: 0.75rem; color: var(--text-muted);">Teacher's Comment</span>
+                                    </div>
+                                </div>
+                                <div class="teacher-comment-content">
+                                    <p id="teacher-main-comment">Chưa có nhận xét.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -969,7 +1154,30 @@
                                 <input type="text" id="lesson-act-input" class="form-control" placeholder="Ví dụ: Flashcards, Speaking Game...">
                             </div>
                         </div>
-                        <button class="btn-success" onclick="saveLessonDetails()">💾 Lưu Bài Học Ngày Này</button>
+
+                        <div class="lesson-resource-upload-grid">
+                            <div class="lesson-resource-box">
+                                <label>🖼️ Hình ảnh bài học</label>
+                                <input type="file" id="lesson-image-files" class="form-control" accept="image/*" multiple>
+                                <small> Có thể chọn nhiều ảnh. Ảnh sẽ hiển thị cho học sinh trong phần Bài Học Trong Ngày.</small>
+                            </div>
+
+                            <div class="lesson-resource-box">
+                                <label>🎧 Link nghe</label>
+                                <input type="url" id="lesson-audio-link" class="form-control" placeholder="https://...">
+                                <small>Dán link YouTube, Google Drive, Canva, file MP3... mà học sinh có thể mở.</small>
+                            </div>
+
+                            <div class="lesson-resource-box">
+                                <label>📎 Tệp tài liệu</label>
+                                <input type="file" id="lesson-document-files" class="form-control" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.zip" multiple>
+                                <small>Có thể tải nhiều tài liệu. Tệp được lưu vào Firebase Storage.</small>
+                            </div>
+                        </div>
+
+                        <div id="lesson-resource-existing" class="lesson-resource-existing"></div>
+
+                        <button class="btn-success" id="save-lesson-btn" onclick="saveLessonDetails()">💾 Lưu Bài Học Ngày Này</button>
                     </div>
 
                     <!-- KHUNG QUẢN LÝ ẢNH HOẠT ĐỘNG LỚP (TÁCH RIÊNG) -->
@@ -1062,14 +1270,22 @@
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <label style="font-size: 0.9rem; font-weight: 700; color: var(--pastel-purple-dark);">✨ Nhận Xét Quick-Tags:</label>
                                 <button type="button" class="btn-ai" onclick="generateAIComment()">🤖 AI Gợi Ý Nhận Xét Tự Nhiên</button>
+                                <span style="font-size:.74rem;color:#64748b;">Tự nhận diện cấp độ lớp + mức điểm để tạo nhận xét gần gũi, chi tiết và phù hợp độ tuổi.</span>
                             </div>
                             
                             <div class="chip-group">
-                                <span class="chip" onclick="appendComment('Phát âm chuẩn, tự nhiên và ngữ điệu rất tốt.')">+ Phát âm tốt</span>
-                                <span class="chip" onclick="appendComment('Nắm vững từ vựng Unit và áp dụng tốt ngữ pháp.')">+ Từ vựng/Ngữ pháp tốt</span>
-                                <span class="chip" onclick="appendComment('Rất tích cực giơ tay phát biểu trong giờ.')">+ Tích cực phát biểu</span>
-                                <span class="chip" onclick="appendComment('Cần lưu ý ôn tập lại từ vựng cũ bài trước.')">+ Ôn lại từ vựng</span>
-                                <span class="chip" onclick="appendComment('Cần tập trung hơn, tránh làm việc riêng trong lớp.')">+ Cần tập trung</span>
+                                <span class="chip" onclick="appendComment('Phát âm khá rõ và con rất tự tin khi nói.')">+ Phát âm tốt</span>
+                                <span class="chip" onclick="appendComment('Con ghi nhớ từ vựng tốt và biết vận dụng vào bài học.')">+ Từ vựng tốt</span>
+                                <span class="chip" onclick="appendComment('Con sử dụng cấu trúc câu khá chính xác và có tiến bộ rõ rệt.')">+ Ngữ pháp tốt</span>
+                                <span class="chip" onclick="appendComment('Con nghe và bắt từ khóa khá nhanh.')">+ Nghe tốt</span>
+                                <span class="chip" onclick="appendComment('Con rất tích cực tham gia các hoạt động và trò chơi trên lớp.')">+ Tích cực</span>
+                                <span class="chip" onclick="appendComment('Con mạnh dạn hơn khi trả lời câu hỏi và giao tiếp với cô.')">+ Tự tin</span>
+                                <span class="chip" onclick="appendComment('Con cần ôn lại từ vựng cũ thường xuyên hơn để ghi nhớ lâu hơn.')">+ Ôn từ vựng</span>
+                                <span class="chip" onclick="appendComment('Con cần luyện thêm cách đặt câu và sắp xếp từ trong câu.')">+ Luyện đặt câu</span>
+                                <span class="chip" onclick="appendComment('Con cần chú ý phát âm âm cuối và nghe lại mẫu câu ở nhà.')">+ Âm cuối</span>
+                                <span class="chip" onclick="appendComment('Con cần tập trung hơn trong một số hoạt động để hoàn thành bài chắc chắn hơn.')">+ Cần tập trung</span>
+                                <span class="chip" onclick="appendComment('Con đang tiến bộ từng bước, cô mong con tiếp tục duy trì thói quen học tập này.')">+ Đang tiến bộ</span>
+                                <span class="chip" onclick="appendComment('Ba mẹ có thể cùng con ôn lại 5-10 từ vựng và 2-3 câu mẫu sau mỗi buổi học nhé.')">+ Gợi ý ở nhà</span>
                             </div>
                         </div>
 
@@ -1167,6 +1383,7 @@
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
+        const storage = firebase.storage();
 
         const ADMIN_PASSWORD = "hanna126";
         const DEFAULT_CLASSES = ["Pre-Starters", "Starters", "Movers"];
@@ -1179,7 +1396,7 @@
 
         const DEFAULT_LESSON_DETAILS = {
             "Pre-Starters": {
-                "2026-08-15": { topic: "Animals", vocab: "dog, cat, rabbit, bird, fish", grammar: "This is a... / I have...", activities: "Flashcards, Speaking Game, Worksheet" }
+                "2026-08-15": { topic: "Animals", vocab: "dog, cat, rabbit, bird, fish", grammar: "This is a... / I have...", activities: "Flashcards, Speaking Game, Worksheet", imageUrls: [], audioLink: "", documents: [] }
             }
         };
 
@@ -1352,31 +1569,181 @@
             document.getElementById('admin-gallery-date-label').innerText = formatDateVN(dateStr);
 
             if (!lessonDetailsMap[currentClass]) lessonDetailsMap[currentClass] = {};
-            const details = lessonDetailsMap[currentClass][dateStr] || { topic: "", vocab: "", grammar: "", activities: "" };
+            const details = lessonDetailsMap[currentClass][dateStr] || { topic: "", vocab: "", grammar: "", activities: "", imageUrls: [], audioLink: "", documents: [] };
 
             document.getElementById('lesson-topic-input').value = details.topic || "";
             document.getElementById('lesson-vocab-input').value = details.vocab || "";
             document.getElementById('lesson-grammar-input').value = details.grammar || "";
             document.getElementById('lesson-act-input').value = details.activities || "";
+            document.getElementById('lesson-audio-link').value = details.audioLink || "";
 
+            renderLessonResourceExisting(details);
             renderAdminGalleryPreview();
         }
 
-        function saveLessonDetails() {
+        async function saveLessonDetails() {
             const currentClass = document.getElementById('admin-class-filter').value;
             const dateStr = document.getElementById('admin-date-picker').value;
             if (!dateStr) { alert("Vui lòng chọn ngày học!"); return; }
 
+            const btn = document.getElementById('save-lesson-btn');
+            const imageInput = document.getElementById('lesson-image-files');
+            const documentInput = document.getElementById('lesson-document-files');
+            const audioLink = document.getElementById('lesson-audio-link').value.trim();
+
             if (!lessonDetailsMap[currentClass]) lessonDetailsMap[currentClass] = {};
-            lessonDetailsMap[currentClass][dateStr] = {
+            const oldDetails = lessonDetailsMap[currentClass][dateStr] || {};
+
+            const details = {
                 topic: document.getElementById('lesson-topic-input').value,
                 vocab: document.getElementById('lesson-vocab-input').value,
                 grammar: document.getElementById('lesson-grammar-input').value,
-                activities: document.getElementById('lesson-act-input').value
+                activities: document.getElementById('lesson-act-input').value,
+                imageUrls: Array.isArray(oldDetails.imageUrls) ? oldDetails.imageUrls : [],
+                audioLink: audioLink,
+                documents: Array.isArray(oldDetails.documents) ? oldDetails.documents : []
             };
 
+            try {
+                btn.disabled = true;
+                btn.innerText = "⏳ Đang lưu bài học...";
+
+                if (imageInput.files && imageInput.files.length) {
+                    for (const file of Array.from(imageInput.files)) {
+                        if (!file.type.startsWith('image/')) continue;
+                        const safeName = sanitizeStorageName(file.name);
+                        const path = `lessonAssets/${encodeURIComponent(currentClass)}/${dateStr}/images/${Date.now()}_${safeName}`;
+                        const ref = storage.ref(path);
+                        await ref.put(file);
+                        const url = await ref.getDownloadURL();
+                        details.imageUrls.push({ name: file.name, url, path });
+                    }
+                }
+
+                if (documentInput.files && documentInput.files.length) {
+                    for (const file of Array.from(documentInput.files)) {
+                        const allowed = /\.(pdf|doc|docx|ppt|pptx|xls|xlsx|txt|zip)$/i.test(file.name);
+                        if (!allowed) continue;
+                        const safeName = sanitizeStorageName(file.name);
+                        const path = `lessonAssets/${encodeURIComponent(currentClass)}/${dateStr}/documents/${Date.now()}_${safeName}`;
+                        const ref = storage.ref(path);
+                        await ref.put(file);
+                        const url = await ref.getDownloadURL();
+                        details.documents.push({ name: file.name, url, path });
+                    }
+                }
+
+                lessonDetailsMap[currentClass][dateStr] = details;
+                saveData();
+
+                imageInput.value = '';
+                documentInput.value = '';
+                renderLessonResourceExisting(details);
+                alert(`Đã lưu bài học ngày ${formatDateVN(dateStr)} thành công! 🎉`);
+            } catch (error) {
+                console.error(error);
+                alert("Không thể tải tệp lên Firebase Storage. Hãy kiểm tra Firebase Storage Rules hoặc thử lại.\n\n" + (error.message || error));
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "💾 Lưu Bài Học Ngày Này";
+            }
+        }
+
+        function sanitizeStorageName(name) {
+            return String(name || "file").replace(/[^a-zA-Z0-9._-]/g, "_");
+        }
+
+        function renderLessonResourceExisting(details) {
+            const container = document.getElementById('lesson-resource-existing');
+            if (!container) return;
+
+            const images = Array.isArray(details.imageUrls) ? details.imageUrls : [];
+            const docs = Array.isArray(details.documents) ? details.documents : [];
+            const audio = details.audioLink || "";
+
+            let html = "";
+            if (images.length) {
+                html += `<div style="font-weight:800; margin-bottom:6px;">🖼️ Ảnh đã tải:</div><div class="lesson-resource-list">`;
+                images.forEach((item, idx) => {
+                    const label = item.name || `Ảnh ${idx + 1}`;
+                    html += `<span class="lesson-resource-chip">🖼️ ${escapeHtml(label)} <button onclick="removeLessonImage(${idx})" title="Xóa ảnh">×</button></span>`;
+                });
+                html += `</div>`;
+            }
+
+            if (audio) {
+                html += `<div style="font-weight:800; margin:10px 0 6px;">🎧 Link nghe hiện tại:</div>
+                    <div class="lesson-resource-chip">🔗 <a href="${escapeAttr(audio)}" target="_blank" rel="noopener">${escapeHtml(audio)}</a>
+                    <button onclick="clearLessonAudioLink()" title="Xóa link">×</button></div>`;
+            }
+
+            if (docs.length) {
+                html += `<div style="font-weight:800; margin:10px 0 6px;">📎 Tài liệu đã tải:</div><div class="lesson-resource-list">`;
+                docs.forEach((item, idx) => {
+                    const label = item.name || `Tài liệu ${idx + 1}`;
+                    html += `<span class="lesson-resource-chip">📎 <a href="${escapeAttr(item.url)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>
+                        <button onclick="removeLessonDocument(${idx})" title="Xóa tài liệu">×</button></span>`;
+                });
+                html += `</div>`;
+            }
+
+            container.innerHTML = html || `<span class="lesson-resource-empty">Chưa có tài nguyên bổ sung cho buổi học này.</span>`;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? "").replace(/[&<>"']/g, ch => ({
+                '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+            }[ch]));
+        }
+
+        function escapeAttr(value) {
+            return String(value ?? "").replace(/"/g, '&quot;');
+        }
+
+        function clearLessonAudioLink() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            if (!lessonDetailsMap[currentClass]?.[dateStr]) return;
+            lessonDetailsMap[currentClass][dateStr].audioLink = "";
+            document.getElementById('lesson-audio-link').value = "";
             saveData();
-            alert(`Đã lưu thông tin bài học ngày ${formatDateVN(dateStr)} thành công! 🎉`);
+            renderLessonResourceExisting(lessonDetailsMap[currentClass][dateStr]);
+        }
+
+        async function removeLessonImage(idx) {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            const details = lessonDetailsMap[currentClass]?.[dateStr];
+            if (!details || !Array.isArray(details.imageUrls)) return;
+            if (!confirm("Bạn có chắc muốn xóa ảnh bài học này?")) return;
+
+            const item = details.imageUrls[idx];
+            try {
+                if (item?.path) await storage.ref(item.path).delete();
+            } catch (e) {
+                console.warn("Không xóa được file Storage, sẽ vẫn xóa liên kết:", e);
+            }
+            details.imageUrls.splice(idx, 1);
+            saveData();
+            renderLessonResourceExisting(details);
+        }
+
+        async function removeLessonDocument(idx) {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            const details = lessonDetailsMap[currentClass]?.[dateStr];
+            if (!details || !Array.isArray(details.documents)) return;
+            if (!confirm("Bạn có chắc muốn xóa tài liệu này?")) return;
+
+            const item = details.documents[idx];
+            try {
+                if (item?.path) await storage.ref(item.path).delete();
+            } catch (e) {
+                console.warn("Không xóa được file Storage, sẽ vẫn xóa liên kết:", e);
+            }
+            details.documents.splice(idx, 1);
+            saveData();
+            renderLessonResourceExisting(details);
         }
 
         function renderAdminViews() {
@@ -1574,21 +1941,69 @@
         }
 
         function renderStudentLessonContent() {
+            const imageCard = document.getElementById('student-lesson-images-card');
+            const audioCard = document.getElementById('student-lesson-audio-card');
+            const documentsCard = document.getElementById('student-lesson-documents-card');
+
             if (!studentSelectedLessonDate) {
                 document.getElementById('lesson-topic-val').innerText = "Chưa có dữ liệu";
                 document.getElementById('lesson-vocab-val').innerText = "Chưa có dữ liệu";
                 document.getElementById('lesson-grammar-val').innerText = "Chưa có dữ liệu";
                 document.getElementById('lesson-activities-val').innerText = "Chưa có dữ liệu";
+                imageCard?.classList.add('hidden');
+                audioCard?.classList.add('hidden');
+                documentsCard?.classList.add('hidden');
                 return;
             }
 
             const classLessons = lessonDetailsMap[currentStudent.className] || {};
-            const lesson = classLessons[studentSelectedLessonDate] || { topic: "Chưa cập nhật", vocab: "Chưa cập nhật", grammar: "Chưa cập nhật", activities: "Chưa cập nhật" };
+            const lesson = classLessons[studentSelectedLessonDate] || {
+                topic: "Chưa cập nhật", vocab: "Chưa cập nhật", grammar: "Chưa cập nhật",
+                activities: "Chưa cập nhật", imageUrls: [], audioLink: "", documents: []
+            };
 
             document.getElementById('lesson-topic-val').innerText = lesson.topic || "Chưa cập nhật";
             document.getElementById('lesson-vocab-val').innerText = lesson.vocab || "Chưa cập nhật";
             document.getElementById('lesson-grammar-val').innerText = lesson.grammar || "Chưa cập nhật";
             document.getElementById('lesson-activities-val').innerText = lesson.activities || "Chưa cập nhật";
+
+            const images = Array.isArray(lesson.imageUrls) ? lesson.imageUrls : [];
+            const docs = Array.isArray(lesson.documents) ? lesson.documents : [];
+            const audio = lesson.audioLink || "";
+
+            if (imageCard) {
+                if (images.length) {
+                    imageCard.classList.remove('hidden');
+                    document.getElementById('student-lesson-images').innerHTML =
+                        `<div class="lesson-resource-image-grid">` +
+                        images.map(item => `<img src="${escapeAttr(item.url || item)}" alt="${escapeAttr(item.name || 'Hình bài học')}" onclick="openLightbox('${String(item.url || item).replace(/'/g, "\\'")}')">`).join('') +
+                        `</div>`;
+                } else {
+                    imageCard.classList.add('hidden');
+                }
+            }
+
+            if (audioCard) {
+                if (audio) {
+                    audioCard.classList.remove('hidden');
+                    document.getElementById('student-lesson-audio').innerHTML =
+                        `<a class="lesson-resource-link" href="${escapeAttr(audio)}" target="_blank" rel="noopener">🎧 Mở link nghe bài học ↗</a>`;
+                } else {
+                    audioCard.classList.add('hidden');
+                }
+            }
+
+            if (documentsCard) {
+                if (docs.length) {
+                    documentsCard.classList.remove('hidden');
+                    document.getElementById('student-lesson-documents').innerHTML =
+                        `<div style="display:flex; flex-direction:column; gap:8px;">` +
+                        docs.map(item => `<a class="lesson-resource-link" href="${escapeAttr(item.url)}" target="_blank" rel="noopener">📎 ${escapeHtml(item.name || 'Tài liệu bài học')} ↗</a>`).join('') +
+                        `</div>`;
+                } else {
+                    documentsCard.classList.add('hidden');
+                }
+            }
         }
 
         function renderStudentLessonTab() {
@@ -1901,43 +2316,190 @@
 
         function generateAIComment() {
             const name = document.getElementById('form-name').value.trim() || "Con";
+            const className = document.getElementById('form-class').value || "";
             const lis = parseFloat(document.getElementById('form-score-lis').value) || 0;
             const rw = parseFloat(document.getElementById('form-score-rw').value) || 0;
             const spk = parseFloat(document.getElementById('form-score-spk').value) || 0;
             const avg = parseFloat(((lis + rw + spk) / 3).toFixed(1));
 
-            const introsEx = [
-                `Cô gửi lời khen ngợi đến ${name} vì kết quả bài kiểm tra kỳ này vô cùng ấn tượng! `,
-                `${name} đã có một buổi làm bài thi rất xuất sắc và chỉn chu. `,
-                `Cô rất tự hào về tinh thần học tập và sự tiến bộ rõ rệt của ${name}! `
-            ];
-            const introsGood = [
-                `${name} hoàn thành bài kiểm tra tương đối tốt và giữ phong độ học tập ổn định. `,
-                `Cô thấy ${name} rất cố gắng trong bài thi vừa rồi và đạt kết quả đáng khích lệ. `,
-                `Bài làm của ${name} thể hiện con nắm bài khá kĩ và có tinh thần học rất tích cực. `
-            ];
-            const introsNeedEffort = [
-                `Bài kiểm tra đợt này ${name} có đôi chỗ còn chệch xạc một chút, nhưng cô tin con sẽ làm tốt hơn ở bài sau! `,
-                `${name} rất cố gắng hoàn thành bài thi, tuy nhiên kết quả chưa thực sự đúng với khả năng của con. `,
-                `Cô thấy ${name} đã nỗ lực nhiều, chỉ cần tập trung thêm chút nữa là con sẽ tiến bộ ngay. `
-            ];
+            /*
+             * COMMENT BANK:
+             * - Pre-Starters: giọng nhẹ nhàng, vui vẻ, phù hợp trẻ nhỏ 4-6 tuổi.
+             * - Starters: gần gũi, khuyến khích phản xạ, từ vựng, phonics và câu ngắn.
+             * - Movers: chi tiết hơn, nhấn mạnh độ chính xác, phản xạ và khả năng tự học.
+             * - Flyers: dùng cho lớp Flyers/Pre-Flyers nếu giáo viên thêm lớp sau này.
+             * - Các lớp khác: dùng bộ General.
+             *
+             * Đây là "AI Gợi Ý" chạy ngay trong file HTML, không cần API.
+             * Mỗi lần bấm sẽ chọn ngẫu nhiên một cấu trúc để nhận xét không bị lặp.
+             */
 
-            let strengthText = "";
-            if (spk >= 8.5) strengthText += "Con phản xạ nói rất tự nhiên, phát âm tròn vành rõ chữ và tự tin tương tác với cô. ";
-            else if (lis >= 8.5) strengthText += "Khả năng nghe hiểu của con rất nhạy bén, bắt từ khóa tốt và trả lời chính xác. ";
-            else if (rw >= 8.5) strengthText += "Con ghi nhớ từ vựng kĩ, viết câu chỉn chu và cẩn thận trong phần Đọc - Viết. ";
+            function getRandom(arr) {
+                return arr[Math.floor(Math.random() * arr.length)];
+            }
 
-            let adviceText = "";
-            if (avg >= 8.5) adviceText += "Con hãy tiếp tục phát huy sự tự tin này trong các buổi học tiếp theo nhé!";
-            else if (avg >= 7.0) adviceText += "Ở nhà con chú ý dành thêm 10-15 phút mỗi ngày xem lại từ vựng cũ để vững vàng hơn nhé.";
-            else adviceText += "Thời gian tới cô và Ba Mẹ sẽ đồng hành để giúp con luyện lại từ vựng và ngữ pháp kỹ hơn nha.";
+            function levelOf(cls) {
+                const c = String(cls).toLowerCase();
+                if (c.includes('pre-starter') || c.includes('prestarters') || c.includes('kindy') || c.includes('preschool') || c.includes('mầm')) return 'prestarters';
+                if (c.includes('flyer')) return 'flyers';
+                if (c.includes('mover')) return 'movers';
+                if (c.includes('starter')) return 'starters';
+                return 'general';
+            }
 
-            function getRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+            const level = levelOf(className);
 
-            let result = "";
-            if (avg >= 8.5) result = getRandom(introsEx) + strengthText + adviceText;
-            else if (avg >= 7.0) result = getRandom(introsGood) + strengthText + adviceText;
-            else result = getRandom(introsNeedEffort) + adviceText;
+            const bank = {
+                prestarters: {
+                    excellent: [
+                        `${name} hôm nay làm bài rất vui vẻ và tự tin. Con nhớ từ vựng khá tốt, nghe hiểu nhanh và mạnh dạn trả lời cô. Cô rất vui vì con ngày càng chủ động hơn trong giờ học. Mình tiếp tục giữ tinh thần học thật vui như vậy nhé!`,
+                        `${name} có một bài kiểm tra rất đáng khen. Con phản xạ tốt với những từ và mẫu câu quen thuộc, đặc biệt rất mạnh dạn khi nói. Cô thấy con đang tiến bộ từng bước và ngày càng tự tin hơn. Ba mẹ tiếp tục cùng con ôn lại một chút mỗi ngày nhé!`,
+                        `Cô rất vui với kết quả của ${name} lần này! Con nhớ bài tốt, tham gia rất tích cực và không ngại thử trả lời bằng tiếng Anh. Với lứa tuổi của con, sự tự tin và hứng thú học như vậy là một điểm rất đáng quý. Con tiếp tục phát huy nha!`,
+                        `${name} làm bài rất tốt và thể hiện tinh thần học tập đáng yêu. Con nhận biết từ vựng nhanh, nghe khá tốt và phản xạ tự nhiên với các câu hỏi quen thuộc. Cô khen con vì đã cố gắng và mạnh dạn hơn nhiều rồi!`
+                    ],
+                    good: [
+                        `${name} hoàn thành bài khá tốt và cô thấy con đã nhớ được phần lớn từ vựng, mẫu câu đã học. Con đôi lúc còn cần cô nhắc lại câu hỏi hoặc từ khóa nhưng nhìn chung con đã tự tin hơn. Mình cùng luyện thêm một chút mỗi ngày nhé!`,
+                        `Bài làm của ${name} có nhiều điểm đáng khen. Con đã nhận biết được từ vựng và hiểu các mẫu câu quen thuộc, chỉ cần thêm một chút tập trung để trả lời chắc chắn hơn. Cô tin con sẽ tiến bộ rất nhanh nếu duy trì việc ôn bài đều đặn.`,
+                        `${name} đã rất cố gắng trong bài kiểm tra lần này. Con làm tốt những phần quen thuộc và đang dần mạnh dạn hơn khi sử dụng tiếng Anh. Ở nhà ba mẹ có thể cùng con xem lại từ vựng bằng flashcards hoặc trò chơi ngắn để con nhớ lâu hơn nha!`
+                    ],
+                    developing: [
+                        `${name} đã rất cố gắng hoàn thành bài và cô ghi nhận sự nỗ lực của con. Một số từ vựng và mẫu câu con vẫn cần được nhắc lại thêm, đặc biệt khi câu hỏi thay đổi một chút. Mình cứ học từng chút một, luyện lại bằng hình ảnh và trò chơi để con cảm thấy thật vui nhé!`,
+                        `Kết quả lần này cho thấy ${name} vẫn còn một vài phần chưa thật sự chắc. Con cần thêm thời gian để nhớ từ và phản xạ với câu hỏi bằng tiếng Anh. Cô và ba mẹ sẽ cùng đồng hành, chỉ cần con kiên trì thì chắc chắn con sẽ tiến bộ.`,
+                        `${name} đã cố gắng rất nhiều để hoàn thành bài. Con còn hơi ngập ngừng ở một số câu nhưng đây là điều hoàn toàn có thể cải thiện qua việc luyện tập thường xuyên. Cô mong con tiếp tục mạnh dạn trả lời, không sợ sai và luôn giữ niềm vui khi học tiếng Anh nha!`
+                    ]
+                },
+
+                starters: {
+                    excellent: [
+                        `${name} có một bài kiểm tra rất tốt và thể hiện khả năng ghi nhớ từ vựng khá chắc. Con nghe hiểu nhanh, phản xạ tốt với các câu hỏi quen thuộc và khá tự tin khi nói. Cô rất vui vì con đang hình thành được thói quen sử dụng tiếng Anh thay vì chỉ học thuộc bài. Tiếp tục phát huy nhé!`,
+                        `Cô khen ${name} vì kết quả lần này rất đáng khích lệ. Con nắm khá chắc từ vựng và mẫu câu, đặc biệt phần nghe và nói được thực hiện rất tự tin. Con chỉ cần tiếp tục luyện đều đặn để phản xạ ngày càng tự nhiên hơn nhé!`,
+                        `${name} làm bài chỉn chu và cho thấy sự tiến bộ rõ rệt. Con nhớ từ khá tốt, hiểu câu hỏi và biết sử dụng mẫu câu đã học trong tình huống quen thuộc. Cô rất vui khi thấy con ngày càng mạnh dạn hơn trong giờ học.`,
+                        `Bài kiểm tra của ${name} thể hiện nền tảng tiếng Anh khá tốt ở cấp độ Starters. Con làm bài tự tin, nắm được từ vựng chủ đề và có phản xạ khá nhanh. Cô mong con tiếp tục luyện nghe và nói thường xuyên để sự tự tin này trở thành phản xạ tự nhiên.`
+                    ],
+                    good: [
+                        `${name} hoàn thành bài khá tốt và có nền tảng kiến thức tương đối chắc. Con nhớ được phần lớn từ vựng và mẫu câu, tuy nhiên đôi lúc vẫn cần thêm thời gian để phản xạ hoặc kiểm tra lại đáp án. Ở nhà con có thể dành 10 phút ôn từ và đọc lại các câu mẫu đã học nhé.`,
+                        `Cô thấy ${name} đã có nhiều cố gắng trong bài kiểm tra lần này. Con hiểu bài và làm tốt các dạng quen thuộc, chỉ cần chú ý hơn một chút về chính tả, từ vựng và cách sắp xếp câu. Nếu luyện đều mỗi ngày, con sẽ tiến bộ rất nhanh.`,
+                        `${name} đang duy trì kết quả khá ổn định. Con có vốn từ tốt và hiểu được các mẫu câu cơ bản, nhưng phần phản xạ đôi lúc còn hơi chậm. Cô khuyến khích con nghe lại audio và tự trả lời câu hỏi thành tiếng ở nhà để tăng độ tự tin nha!`
+                    ],
+                    developing: [
+                        `${name} đã cố gắng hoàn thành bài nhưng một số kiến thức vẫn chưa thật sự chắc, đặc biệt là từ vựng và mẫu câu. Con cần ôn lại bài cũ thường xuyên hơn thay vì chỉ học ngay trước ngày kiểm tra. Cô tin rằng nếu duy trì 10-15 phút luyện tập mỗi ngày, kết quả của con sẽ cải thiện rõ rệt.`,
+                        `Bài kiểm tra cho thấy ${name} đã hiểu một phần nội dung nhưng còn dễ nhầm khi câu hỏi thay đổi. Con cần củng cố lại từ vựng, mẫu câu và luyện nghe thường xuyên hơn. Quan trọng nhất là con đừng ngại nói sai; cứ mạnh dạn thử, cô sẽ cùng con sửa từng bước nhé!`,
+                        `Cô ghi nhận sự cố gắng của ${name}. Hiện tại con cần thêm thời gian để củng cố kiến thức nền, đặc biệt ở phần từ vựng và phản xạ nói. Ba mẹ có thể cùng con ôn một lượng nhỏ từ mỗi ngày và khuyến khích con nói thành câu ngắn để con tiến bộ chắc hơn.`
+                    ]
+                },
+
+                movers: {
+                    excellent: [
+                        `${name} có một bài kiểm tra rất ấn tượng. Con nắm khá chắc từ vựng và cấu trúc câu, đồng thời có khả năng phản xạ tốt khi nghe và nói. Phần trình bày của con khá tự tin và cho thấy con đang sử dụng tiếng Anh chủ động hơn. Cô rất vui với sự tiến bộ này và mong con tiếp tục duy trì nhé!`,
+                        `Cô rất hài lòng với bài làm của ${name}. Con không chỉ nhớ kiến thức mà còn biết vận dụng vào câu hỏi, đặc biệt phần nói và nghe thể hiện phản xạ khá tự nhiên. Đây là một bước tiến rất tốt ở cấp độ Movers. Con tiếp tục luyện nghe và mở rộng vốn từ để nâng cao hơn nữa nhé!`,
+                        `${name} làm bài chắc tay và thể hiện sự tiến bộ rõ rệt. Con sử dụng từ vựng khá linh hoạt, hiểu nội dung nghe tốt và diễn đạt tương đối tự tin. Cô khen con vì đã có ý thức kiểm tra lại bài và cố gắng hoàn thành thật chỉn chu.`,
+                        `Kết quả lần này cho thấy ${name} đang có nền tảng rất tốt ở cấp độ Movers. Con phản xạ khá nhanh, nắm được cấu trúc và biết vận dụng kiến thức vào bài. Cô mong con tiếp tục đọc, nghe và nói tiếng Anh thường xuyên để phát triển khả năng sử dụng ngôn ngữ tự nhiên hơn.`
+                    ],
+                    good: [
+                        `${name} hoàn thành bài khá tốt và cho thấy kiến thức nền tương đối chắc. Con làm tốt những phần quen thuộc, tuy nhiên vẫn có một vài lỗi nhỏ về từ vựng, chính tả hoặc cấu trúc câu. Cô khuyến khích con kiểm tra lại bài trước khi nộp và luyện thêm cách đặt câu để tăng độ chính xác nhé!`,
+                        `Cô ghi nhận sự cố gắng của ${name} trong bài kiểm tra này. Con hiểu bài và có khả năng vận dụng kiến thức, nhưng phần phản xạ đôi lúc chưa thật sự ổn định. Con có thể nghe lại audio, shadowing một vài câu và tự nói lại nội dung ở nhà để cải thiện độ trôi chảy.`,
+                        `${name} đang duy trì phong độ khá tốt. Con có vốn từ và khả năng hiểu bài ổn, nhưng cần cẩn thận hơn ở những câu yêu cầu vận dụng. Nếu con dành thêm thời gian ôn lại lỗi sai sau mỗi bài kiểm tra, kết quả sẽ còn tốt hơn nữa.`,
+                        `Bài làm của ${name} cho thấy con đã nắm được phần lớn nội dung. Điểm cô muốn con cải thiện thêm là sự chính xác khi viết câu và khả năng phản xạ khi gặp câu hỏi mới. Con cứ luyện từng bước, chất lượng sẽ tiến bộ rất rõ nha!`
+                    ],
+                    developing: [
+                        `${name} đã cố gắng hoàn thành bài nhưng một số kiến thức nền vẫn chưa thật sự chắc. Con cần dành thêm thời gian ôn từ vựng, cấu trúc câu và luyện nghe thường xuyên để tăng khả năng phản xạ. Cô mong con đừng học dồn trước kiểm tra mà hãy chia nhỏ việc ôn tập mỗi ngày nhé.`,
+                        `Kết quả lần này cho thấy ${name} cần củng cố thêm một số nội dung đã học. Con còn dễ nhầm từ vựng và cấu trúc khi đặt trong câu hỏi mới. Cô sẽ tiếp tục hỗ trợ con trên lớp, còn ở nhà con cố gắng ôn lại lỗi sai và luyện nói thành câu ngắn mỗi ngày nha.`,
+                        `Cô ghi nhận sự nỗ lực của ${name}, tuy nhiên con cần chủ động hơn trong việc ôn bài. Đặc biệt, phần từ vựng và cấu trúc câu cần được luyện lại thường xuyên để con không bị quên khi làm bài. Cô tin rằng nếu con duy trì đều đặn, kết quả sẽ cải thiện từng bước.`,
+                        `${name} đang ở giai đoạn cần củng cố nền tảng để tiến bộ chắc hơn. Con đã có cố gắng nhưng đôi lúc còn thiếu tự tin khi gặp câu hỏi khác với ví dụ trên lớp. Mình cùng luyện thêm từ vựng, nghe và đặt câu; quan trọng là con cứ mạnh dạn thử và sửa lỗi nhé!`
+                    ]
+                },
+
+                flyers: {
+                    excellent: [
+                        `${name} có kết quả rất tốt và thể hiện khả năng sử dụng tiếng Anh khá chủ động. Con nắm chắc từ vựng, hiểu cấu trúc và có phản xạ nghe nói tốt. Đặc biệt, con khá tự tin khi xử lý những câu hỏi yêu cầu vận dụng thay vì chỉ nhớ mẫu câu. Cô rất vui với sự tiến bộ này và mong con tiếp tục thử sức với những nội dung khó hơn nhé!`,
+                        `Cô rất hài lòng với bài làm của ${name}. Con có nền tảng tốt, làm bài cẩn thận và biết vận dụng kiến thức vào tình huống mới. Phần nghe và nói thể hiện sự tự tin, còn phần đọc viết khá chắc chắn. Con tiếp tục đọc thêm và nghe tiếng Anh thường xuyên để nâng cao độ tự nhiên nhé!`,
+                        `${name} đang có một bước tiến rất tốt ở cấp độ Flyers. Con không chỉ ghi nhớ kiến thức mà còn biết lựa chọn từ và cấu trúc phù hợp khi trả lời. Cô khen sự chủ động và tinh thần tự kiểm tra lỗi của con. Tiếp tục duy trì thói quen này nha!`
+                    ],
+                    good: [
+                        `${name} hoàn thành bài khá tốt và cho thấy con đã nắm được phần lớn kiến thức trọng tâm. Một số lỗi nhỏ vẫn xuất hiện ở phần vận dụng, đặc biệt khi câu hỏi thay đổi cách diễn đạt. Con nên ghi lại lỗi sai sau mỗi bài và luyện lại bằng cách tự đặt câu để tăng độ chắc chắn nhé.`,
+                        `Cô thấy ${name} có nền tảng khá ổn và đang tiến bộ đều. Con làm tốt những phần quen thuộc nhưng cần chú ý hơn đến độ chính xác khi viết câu và phản xạ khi nghe. Nếu duy trì thói quen đọc và nghe tiếng Anh mỗi ngày, khả năng sử dụng ngôn ngữ của con sẽ tự nhiên hơn nhiều.`,
+                        `${name} đã thể hiện tinh thần học tập tốt trong bài kiểm tra. Con hiểu nội dung và có khả năng vận dụng, tuy nhiên vẫn cần cẩn thận hơn với những chi tiết nhỏ. Cô mong con tiếp tục luyện tập đều, đặc biệt là paraphrase và đặt câu để tăng khả năng xử lý câu hỏi mới.`
+                    ],
+                    developing: [
+                        `${name} đã cố gắng nhưng kết quả cho thấy con vẫn cần củng cố một số kiến thức nền. Con nên ưu tiên ôn lại từ vựng theo chủ đề, cấu trúc câu và các lỗi sai thường gặp trước khi chuyển sang nội dung mới. Cô sẽ đồng hành cùng con trên lớp, còn con cố gắng duy trì việc luyện tập đều đặn ở nhà nhé.`,
+                        `Bài làm của ${name} cho thấy con đã hiểu một phần nội dung nhưng chưa thật sự ổn định khi vận dụng. Con cần luyện thêm khả năng đọc hiểu câu hỏi, nghe bắt ý và diễn đạt câu trả lời đầy đủ hơn. Cô tin rằng nếu con kiên trì sửa từng nhóm lỗi nhỏ, kết quả sẽ cải thiện rõ rệt.`,
+                        `Cô ghi nhận sự nỗ lực của ${name}. Ở giai đoạn này, con cần tập trung củng cố từ vựng và cấu trúc trước, đồng thời luyện cách áp dụng chúng vào câu mới. Đừng quá lo khi gặp lỗi; điều quan trọng là con hiểu lỗi ở đâu và sửa lại lần sau nha.`
+                    ]
+                },
+
+                general: {
+                    excellent: [
+                        `${name} có một bài kiểm tra rất tốt và thể hiện tinh thần học tập tích cực. Con nắm kiến thức khá chắc, làm bài tự tin và có khả năng vận dụng những gì đã học. Cô rất vui với kết quả này và mong con tiếp tục duy trì phong độ nhé!`,
+                        `Cô rất hài lòng với bài làm của ${name}. Con thể hiện sự tiến bộ rõ rệt cả về kiến thức lẫn sự tự tin. Tiếp tục ôn tập đều đặn và mạnh dạn sử dụng tiếng Anh trong lớp nha!`
+                    ],
+                    good: [
+                        `${name} hoàn thành bài khá tốt và đã nắm được phần lớn nội dung đã học. Con cần cẩn thận hơn ở một vài chi tiết nhỏ và duy trì thói quen ôn bài thường xuyên. Cô tin con sẽ tiến bộ thêm nếu luyện tập đều đặn.`,
+                        `Cô ghi nhận sự cố gắng của ${name}. Con có nền tảng khá ổn, chỉ cần tăng thêm độ chính xác và phản xạ khi làm bài. Mỗi ngày dành một chút thời gian ôn lại bài sẽ giúp con chắc kiến thức hơn nhé!`
+                    ],
+                    developing: [
+                        `${name} đã cố gắng hoàn thành bài nhưng vẫn còn một số phần kiến thức chưa thật sự chắc. Con cần ôn lại từ vựng, cấu trúc và những lỗi sai trong bài. Cô sẽ tiếp tục đồng hành cùng con, mình cố gắng từng bước và đừng ngại sai nhé!`,
+                        `Kết quả lần này cho thấy ${name} cần thêm thời gian để củng cố kiến thức nền. Con hãy chia nhỏ việc ôn tập, luyện đều mỗi ngày và chú ý sửa những lỗi đã mắc trong bài. Cô tin rằng con sẽ tiến bộ nếu duy trì được thói quen này.`
+                    ]
+                }
+            };
+
+            let performance = avg >= 8.5 ? 'excellent' : (avg >= 7 ? 'good' : 'developing');
+            let result = getRandom(bank[level][performance]);
+
+            // Add a specific skill observation so the comment is based on the actual scores.
+            const skills = [
+                { score: spk, text: level === 'prestarters'
+                    ? "Phần nói của con khá tự tin và con đã mạnh dạn trả lời cô."
+                    : "Phần nói của con khá tự tin và khả năng phản xạ đang tiến bộ tốt." },
+                { score: lis, text: level === 'prestarters'
+                    ? "Phần nghe của con khá tốt, con nhận biết được nhiều từ quen thuộc."
+                    : "Phần nghe của con khá tốt, con bắt được từ khóa và ý chính tương đối nhanh." },
+                { score: rw, text: level === 'prestarters'
+                    ? "Con nhận biết từ và mẫu câu khá tốt khi làm phần Đọc - Viết."
+                    : "Con làm phần Đọc - Viết khá chắc, đặc biệt ở khả năng ghi nhớ từ vựng và cấu trúc." }
+            ].sort((a, b) => b.score - a.score);
+
+            if (skills[0].score >= 8.5) {
+                result += " " + skills[0].text;
+            }
+
+            // Give one actionable, age-appropriate next step for children who are not yet excellent.
+            if (performance === 'good') {
+                const nextSteps = {
+                    prestarters: [
+                        "Ba mẹ có thể cùng con ôn 5-7 từ bằng flashcards hoặc trò chơi ngắn mỗi ngày nhé!",
+                        "Ở nhà mình cho con nghe lại audio và nhắc con lặp lại câu mẫu 2-3 lần là rất tốt nha!"
+                    ],
+                    starters: [
+                        "Ba mẹ có thể cùng con ôn 5-10 từ và 2-3 câu mẫu mỗi ngày để tăng phản xạ nhé!",
+                        "Con thử nghe lại audio và nói theo từng câu một vài phút mỗi ngày nha!"
+                    ],
+                    movers: [
+                        "Con thử ghi lại 2-3 lỗi sai sau mỗi bài và tự đặt lại câu để nhớ lâu hơn nhé!",
+                        "Mỗi ngày con dành khoảng 10-15 phút nghe hoặc đọc tiếng Anh sẽ giúp phản xạ tốt hơn rất nhiều."
+                    ],
+                    flyers: [
+                        "Con nên ghi lại lỗi sai sau bài và luyện lại bằng cách tự đặt câu hoặc nói lại nội dung theo cách của mình nhé!",
+                        "Duy trì 15-20 phút đọc/nghe tiếng Anh mỗi ngày sẽ giúp con tăng vốn từ và xử lý câu hỏi nhanh hơn."
+                    ],
+                    general: [
+                        "Mình duy trì khoảng 10-15 phút ôn tập mỗi ngày để kiến thức chắc hơn nhé!",
+                        "Con thử ghi lại những lỗi sai trong bài và xem lại trước buổi học tiếp theo nha!"
+                    ]
+                };
+                result += " " + getRandom(nextSteps[level]);
+            }
+
+            if (performance === 'developing') {
+                const support = {
+                    prestarters: "Ba mẹ có thể đồng hành cùng con bằng những hoạt động thật nhẹ nhàng như flashcards, tranh ảnh và trò chơi từ vựng để con học mà vẫn thấy vui nhé!",
+                    starters: "Ba mẹ có thể cùng con ôn một lượng nhỏ từ mỗi ngày và khuyến khích con nói câu ngắn thay vì học thuộc lòng quá nhiều nha!",
+                    movers: "Con nên chia nhỏ việc ôn tập, ưu tiên những lỗi sai trong bài và luyện lại bằng câu hoàn chỉnh để kiến thức chắc hơn.",
+                    flyers: "Con nên ưu tiên sửa các lỗi sai trong bài, sau đó luyện vận dụng từ và cấu trúc vào câu mới để tăng độ chính xác.",
+                    general: "Con hãy chia nhỏ việc ôn tập và ưu tiên sửa những lỗi sai trong bài trước nhé!"
+                };
+                result += " " + support[level];
+            }
 
             document.getElementById('form-main-comment').value = result;
         }
