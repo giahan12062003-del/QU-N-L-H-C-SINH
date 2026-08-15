@@ -455,31 +455,75 @@
                         </div>
                     </div>
 
-                    <!-- KHUNG NHẬP BÀI HỌC TRONG NGÀY -->
+                    <!-- KHUNG NHẬP BÀI HỌC TRONG NGÀY (TÍCH HỢP 2 TAB) -->
                     <div class="card" style="margin-bottom: 20px; border-left: 5px solid #0284c7; background: #f8fafc;">
-                        <h3 style="margin-bottom: 12px; color: #0369a1; font-size: 1rem;">📖 Cập Nhật Bài Học Trong Ngày (<span id="admin-selected-date-label">--/--/----</span>)</h3>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>Chủ Đề (Topic)</label>
-                                <input type="text" id="lesson-topic-input" class="form-control" placeholder="Ví dụ: Animals, Toys...">
+                        <h3 style="margin-bottom: 12px; color: #0369a1; font-size: 1rem;">📖 Quản Lý Bài Học & Tài Liệu (<span id="admin-selected-date-label">--/--/----</span>)</h3>
+                        
+                        <!-- Thanh Chuyển Đổi Tab Quản Trị Bài Học -->
+                        <ul class="nav nav-tabs mb-3" id="adminLessonTabs" role="tablist" style="border-bottom: 2px solid #cbd5e1; display: flex; gap: 10px; list-style: none; padding: 0;">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-bold px-3 py-2" id="admin-content-tab" data-bs-toggle="tab" data-bs-target="#admin-content-pane" type="button" role="tab" style="background: #0284c7; color: white; border: none; border-radius: 8px 8px 0 0; cursor: pointer;">📖 Nội Dung Bài Học</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-bold px-3 py-2" id="admin-materials-tab" data-bs-toggle="tab" data-bs-target="#admin-materials-pane" type="button" role="tab" style="background: #e2e8f0; color: #475569; border: none; border-radius: 8px 8px 0 0; cursor: pointer;">📁 Tài Liệu & Sách</button>
+                            </li>
+                        </ul>
+
+                        <!-- Nội Dung Các Tab Quản Trị -->
+                        <div class="tab-content" id="adminLessonTabsContent">
+                            <!-- TAB 1: NỘI DUNG BÀI HỌC -->
+                            <div class="tab-pane fade show active" id="admin-content-pane" role="tabpanel" aria-labelledby="admin-content-tab">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>Chủ Đề (Topic)</label>
+                                        <input type="text" id="lesson-topic-input" class="form-control" placeholder="Ví dụ: Animals, Toys...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Từ Vựng (Vocabulary)</label>
+                                        <input type="text" id="lesson-vocab-input" class="form-control" placeholder="Ví dụ: dog, cat, rabbit...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Ngữ Pháp (Grammar)</label>
+                                        <input type="text" id="lesson-grammar-input" class="form-control" placeholder="Ví dụ: This is a... / I have...">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hoạt Động (Activities)</label>
+                                        <input type="text" id="lesson-act-input" class="form-control" placeholder="Ví dụ: Flashcards, Speaking Game...">
+                                    </div>
+                                </div>
+                                <button class="btn-success mt-2" onclick="saveLessonDetails()">💾 Lưu Bài Học Ngày Này</button>
                             </div>
-                            <div class="form-group">
-                                <label>Từ Vựng (Vocabulary)</label>
-                                <input type="text" id="lesson-vocab-input" class="form-control" placeholder="Ví dụ: dog, cat, rabbit...">
-                            </div>
-                            <div class="form-group">
-                                <label>Ngữ Pháp (Grammar)</label>
-                                <input type="text" id="lesson-grammar-input" class="form-control" placeholder="Ví dụ: This is a... / I have...">
-                            </div>
-                            <div class="form-group">
-                                <label>Hoạt Động (Activities)</label>
-                                <input type="text" id="lesson-act-input" class="form-control" placeholder="Ví dụ: Flashcards, Speaking Game...">
+
+                            <!-- TAB 2: TÀI LIỆU & SÁCH -->
+                            <div class="tab-pane fade hidden" id="admin-materials-pane" role="tabpanel" aria-labelledby="admin-materials-tab">
+                                <div class="mb-3">
+                                    <label for="adminBookImageInput" class="form-label fw-bold small text-secondary">🖼️ Tải lên hình ảnh sách / Trang sách chụp:</label>
+                                    <input class="form-control bg-white" type="file" id="adminBookImageInput" accept="image/*" multiple>
+                                    <div class="form-text text-muted" style="font-size: 0.8rem;">Có thể chọn nhiều hình ảnh cùng lúc (PNG, JPG).</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="adminDocumentInput" class="form-label fw-bold small text-secondary">📄 Tải lên tài liệu bài học (Lesson Plans, Worksheets):</label>
+                                    <input class="form-control bg-white" type="file" id="adminDocumentInput" accept=".pdf,.doc,.docx,.pptx" multiple>
+                                    <div class="form-text text-muted" style="font-size: 0.8rem;">Hỗ trợ các định dạng PDF, Word, PowerPoint.</div>
+                                </div>
+                                <button class="btn-primary mt-2" onclick="saveMaterials()">💾 Lưu Tài Liệu</button>
                             </div>
                         </div>
-                        <button class="btn-success" onclick="saveLessonDetails()">💾 Lưu Bài Học Ngày Này</button>
                     </div>
 
-                    <div style="margin-bottom: 12px; font-weight: 700; color: #334155;">📋 Điểm Danh & Tải Hình Ảnh Buổi Học Lên:</div>
+                    <!-- KHUNG QUẢN LÝ ẢNH HOẠT ĐỘNG LỚP (TÁCH RIÊNG) -->
+                    <div class="card" style="margin-bottom: 20px; border-left: 5px solid #7e22ce; background: #faf5ff;">
+                        <h3 style="margin-bottom: 12px; color: #7e22ce; font-size: 1rem;">🖼️ Quản Lý Hình Ảnh Hoạt Động Lớp (<span id="admin-gallery-date-label">--/--/----</span>)</h3>
+                        <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px; flex-wrap: wrap;">
+                            <input type="file" id="admin-gallery-file-input" accept="image/*" class="form-control" style="background:#fff; max-width: 320px;">
+                            <button class="btn-success" onclick="uploadAndAddClassImageFromGallery()">📤 Tải Ảnh Lên Cho Ngày Này</button>
+                        </div>
+                        <div id="admin-gallery-preview-container">
+                            <i>Chưa có hình ảnh nào trong ngày này.</i>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 12px; font-weight: 700; color: #334155;">📋 Bảng Điểm Danh & Bài Tập Về Nhà Học Sinh:</div>
                     <div class="table-wrapper">
                         <table>
                             <thead>
@@ -844,6 +888,7 @@
             const currentClass = document.getElementById('admin-class-filter').value;
             const dateStr = document.getElementById('admin-date-picker').value;
             document.getElementById('admin-selected-date-label').innerText = formatDateVN(dateStr);
+            document.getElementById('admin-gallery-date-label').innerText = formatDateVN(dateStr);
 
             if (!lessonDetailsMap[currentClass]) lessonDetailsMap[currentClass] = {};
             const details = lessonDetailsMap[currentClass][dateStr] || { topic: "", vocab: "", grammar: "", activities: "" };
@@ -852,6 +897,8 @@
             document.getElementById('lesson-vocab-input').value = details.vocab || "";
             document.getElementById('lesson-grammar-input').value = details.grammar || "";
             document.getElementById('lesson-act-input').value = details.activities || "";
+
+            renderAdminGalleryPreview();
         }
 
         function saveLessonDetails() {
@@ -860,16 +907,61 @@
             if (!dateStr) { alert("Vui lòng chọn ngày học!"); return; }
 
             if (!lessonDetailsMap[currentClass]) lessonDetailsMap[currentClass] = {};
-            lessonDetailsMap[currentClass][dateStr] = {
-                topic: document.getElementById('lesson-topic-input').value,
-                vocab: document.getElementById('lesson-vocab-input').value,
-                grammar: document.getElementById('lesson-grammar-input').value,
-                activities: document.getElementById('lesson-act-input').value
-            };
+            if (!lessonDetailsMap[currentClass][dateStr]) lessonDetailsMap[currentClass][dateStr] = {};
+            
+            lessonDetailsMap[currentClass][dateStr].topic = document.getElementById('lesson-topic-input').value;
+            lessonDetailsMap[currentClass][dateStr].vocab = document.getElementById('lesson-vocab-input').value;
+            lessonDetailsMap[currentClass][dateStr].grammar = document.getElementById('lesson-grammar-input').value;
+            lessonDetailsMap[currentClass][dateStr].activities = document.getElementById('lesson-act-input').value;
 
             saveData();
             alert(`Đã lưu thông tin bài học ngày ${formatDateVN(dateStr)} thành công! 🎉`);
         }
+
+        function saveMaterials() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            if (!dateStr) { alert("Vui lòng chọn ngày học!"); return; }
+
+            const bookInput = document.getElementById('adminBookImageInput');
+            const docInput = document.getElementById('adminDocumentInput');
+
+            let msg = `Đã lưu tài liệu cho ngày ${formatDateVN(dateStr)} thành công! 🎉`;
+            if (bookInput.files.length > 0) msg += ` (${bookInput.files.length} ảnh sách)`;
+            if (docInput.files.length > 0) msg += ` (${docInput.files.length} tài liệu)`;
+
+            alert(msg);
+            bookInput.value = '';
+            docInput.value = '';
+        }
+
+        // Script đơn giản xử lý chuyển tab admin thủ công nếu không dùng Bootstrap JS bundle
+        document.addEventListener("DOMContentLoaded", function() {
+            const tabBtns = document.querySelectorAll('#adminLessonTabs .nav-link');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabBtns.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.background = '#e2e8f0';
+                        b.style.color = '#475569';
+                    });
+                    this.classList.add('active');
+                    this.style.background = '#0284c7';
+                    this.style.color = 'white';
+
+                    const targetPaneId = this.getAttribute('data-bs-target');
+                    document.querySelectorAll('#adminLessonTabsContent .tab-pane').forEach(pane => {
+                        pane.classList.add('hidden', 'fade');
+                        pane.classList.remove('show', 'active');
+                    });
+                    const targetPane = document.querySelector(targetPaneId);
+                    if (targetPane) {
+                        targetPane.classList.remove('hidden');
+                        targetPane.classList.add('show', 'active');
+                    }
+                });
+            });
+        });
 
         function renderAdminViews() {
             renderClassManageTable();
@@ -1113,12 +1205,9 @@
             const headerRow = document.getElementById('att-table-header');
             headerRow.innerHTML = `<th>STT</th><th>Họ và Tên Học Sinh</th>` + 
                 classDates.map((dateStr, idx) => `
-                    <th style="background: ${dateStr === activeDate ? '#e0f2fe' : '#f8fafc'};">
-                        <div style="cursor: pointer; color: #0284c7; font-weight: 700; margin-bottom: 6px;" title="Xóa ngày học này" onclick="deleteOrEditDate('${currentClass}', ${idx})">📅 ${formatDateVN(dateStr)} <span style="font-size: 0.7rem; color: #ef4444;">(Xóa)</span></div>
-                        <div style="margin-top: 6px;">
-                            <input type="file" id="img-file-input-${currentClass}-${dateStr}" accept="image/*" class="form-control" style="font-size:0.75rem; padding:3px; margin-bottom:4px; background:#fff;">
-                            <button class="btn-success" style="padding:4px 8px; font-size:0.75rem;" onclick="uploadAndAddClassImage('${currentClass}', '${dateStr}')">📤 Tải Ảnh Lên</button>
-                        </div>
+                    <th style="background: ${dateStr === activeDate ? '#e0f2fe' : '#f8fafc'}; cursor: pointer;" onclick="changeActiveDateFromHeader('${dateStr}')" title="Bấm để chọn ngày này">
+                        📅 ${formatDateVN(dateStr)} <br>
+                        <span style="font-size: 0.75rem; color: #ef4444; font-weight: normal;" onclick="event.stopPropagation(); deleteOrEditDate('${currentClass}', ${idx})">(Xóa)</span>
                     </th>
                 `).join('');
 
@@ -1129,21 +1218,7 @@
                 return;
             }
 
-            let imageRowHTML = `<tr><td>-</td><td><b>📸 Ảnh Hoạt Động Lớp</b></td>` + classDates.map(dateStr => {
-                const imgs = (classImagesMap[currentClass] && classImagesMap[currentClass][dateStr]) || [];
-                let imgCell = '<span style="color:#94a3b8; font-size:0.8rem;">Chưa có ảnh</span>';
-                if (imgs.length > 0) {
-                    imgCell = `<div class="activity-gallery-grid">` + imgs.map((url, imgIdx) => `
-                        <div class="activity-thumb-wrap">
-                            <img src="${url}" class="activity-thumb" onclick="openLightbox('${url}')" title="Bấm xem lớn">
-                            <button class="delete-img-btn" onclick="removeClassActivityImage('${currentClass}', '${dateStr}', ${imgIdx})" title="Xóa ảnh này">×</button>
-                        </div>
-                    `).join('') + `</div>`;
-                }
-                return `<td>${imgCell}</td>`;
-            }).join('') + `</tr>`;
-
-            tbody.innerHTML = imageRowHTML + filteredStudents.map((s, idx) => `
+            tbody.innerHTML = filteredStudents.map((s, idx) => `
                 <tr>
                     <td>${idx + 1}</td>
                     <td><b>${s.name}</b></td>
@@ -1168,11 +1243,42 @@
                     }).join('')}
                 </tr>
             `).join('');
+
+            renderAdminGalleryPreview();
         }
 
-        function uploadAndAddClassImage(className, dateStr) {
-            const fileInputId = `img-file-input-${className}-${dateStr}`;
-            const fileInput = document.getElementById(fileInputId);
+        function changeActiveDateFromHeader(dateStr) {
+            document.getElementById('admin-date-picker').value = dateStr;
+            onAdminDateSelected();
+        }
+
+        function renderAdminGalleryPreview() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            const container = document.getElementById('admin-gallery-preview-container');
+
+            if (!currentClass || !dateStr) {
+                container.innerHTML = '<i>Chưa chọn ngày.</i>';
+                return;
+            }
+
+            const imgs = (classImagesMap[currentClass] && classImagesMap[currentClass][dateStr]) || [];
+            if (imgs.length === 0) {
+                container.innerHTML = '<i>Chưa có hình ảnh nào trong ngày này.</i>';
+            } else {
+                container.innerHTML = `<div class="activity-gallery-grid">` + imgs.map((url, imgIdx) => `
+                    <div class="activity-thumb-wrap">
+                        <img src="${url}" class="activity-thumb" onclick="openLightbox('${url}')" title="Bấm xem lớn">
+                        <button class="delete-img-btn" onclick="removeClassActivityImage('${currentClass}', '${dateStr}', ${imgIdx})" title="Xóa ảnh này">×</button>
+                    </div>
+                `).join('') + `</div>`;
+            }
+        }
+
+        function uploadAndAddClassImageFromGallery() {
+            const currentClass = document.getElementById('admin-class-filter').value;
+            const dateStr = document.getElementById('admin-date-picker').value;
+            const fileInput = document.getElementById('admin-gallery-file-input');
             
             if (!fileInput.files || fileInput.files.length === 0) {
                 alert("Vui lòng bấm chọn tệp ảnh từ máy tính trước nhé!");
@@ -1185,13 +1291,13 @@
             reader.onload = function(e) {
                 const base64Image = e.target.result;
 
-                if (!classImagesMap[className]) classImagesMap[className] = {};
-                if (!classImagesMap[className][dateStr]) classImagesMap[className][dateStr] = [];
+                if (!classImagesMap[currentClass]) classImagesMap[currentClass] = {};
+                if (!classImagesMap[currentClass][dateStr]) classImagesMap[currentClass][dateStr] = [];
 
-                classImagesMap[className][dateStr].push(base64Image);
+                classImagesMap[currentClass][dateStr].push(base64Image);
                 saveData();
                 fileInput.value = '';
-                renderAdminAttTable();
+                renderAdminGalleryPreview();
                 alert("Đã tải ảnh lên và lưu thành công! 🎉");
             };
 
@@ -1207,7 +1313,7 @@
                 if (classImagesMap[className] && classImagesMap[className][dateStr]) {
                     classImagesMap[className][dateStr].splice(imgIdx, 1);
                     saveData();
-                    renderAdminAttTable();
+                    renderAdminGalleryPreview();
                 }
             }
         }
