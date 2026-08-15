@@ -1496,15 +1496,147 @@
             }
         }
 
+
+        /* ================= IMAGE GALLERY SWIPE VIEWER ================= */
+        #image-lightbox {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, .92);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 18px;
+            box-sizing: border-box;
+            touch-action: none;
+        }
+
+        #image-lightbox.hidden {
+            display: none !important;
+        }
+
+        .lightbox-stage {
+            position: relative;
+            width: min(92vw, 980px);
+            height: min(82vh, 760px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: pan-y;
+        }
+
+        #lightbox-img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 12px;
+            user-select: none;
+            -webkit-user-drag: none;
+            box-shadow: 0 12px 45px rgba(0,0,0,.35);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: max(14px, env(safe-area-inset-top, 0px));
+            right: max(14px, env(safe-area-inset-right, 0px));
+            width: 44px;
+            height: 44px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,.16);
+            color: #fff;
+            font-size: 30px;
+            line-height: 1;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 64px;
+            border: 0;
+            border-radius: 16px;
+            background: rgba(255,255,255,.16);
+            color: #fff;
+            font-size: 52px;
+            line-height: 48px;
+            cursor: pointer;
+            z-index: 3;
+            display: grid;
+            place-items: center;
+        }
+
+        .lightbox-prev { left: max(12px, env(safe-area-inset-left, 0px)); }
+        .lightbox-next { right: max(12px, env(safe-area-inset-right, 0px)); }
+
+        .lightbox-counter {
+            position: absolute;
+            left: 50%;
+            bottom: 10px;
+            transform: translateX(-50%);
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,.48);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            #image-lightbox {
+                padding: 10px;
+            }
+
+            .lightbox-stage {
+                width: 100%;
+                height: 78vh;
+            }
+
+            .lightbox-nav {
+                width: 40px;
+                height: 54px;
+                font-size: 42px;
+                background: rgba(255,255,255,.13);
+            }
+
+            .lightbox-prev { left: 6px; }
+            .lightbox-next { right: 6px; }
+
+            .lightbox-close {
+                top: max(10px, env(safe-area-inset-top, 0px));
+                right: max(10px, env(safe-area-inset-right, 0px));
+            }
+
+            #lightbox-img {
+                max-width: 88vw;
+                max-height: 72vh;
+                border-radius: 10px;
+            }
+        }
+
 </style>
 </head>
 <body>
 
 
 
-    <!-- LIGHTBOX XEM ẢNH LỚN -->
+    <!-- LIGHTBOX XEM ẢNH — CÓ LƯỚT TRÁI/PHẢI -->
     <div id="image-lightbox" class="hidden" onclick="closeLightbox()">
-        <img id="lightbox-img" src="" alt="Zoomed Image">
+        <button type="button" class="lightbox-close" onclick="event.stopPropagation(); closeLightbox()" aria-label="Đóng">×</button>
+        <button type="button" class="lightbox-nav lightbox-prev" onclick="event.stopPropagation(); showPreviousGalleryImage()" aria-label="Ảnh trước">‹</button>
+        <div class="lightbox-stage" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Ảnh hoạt động">
+            <div id="lightbox-counter" class="lightbox-counter"></div>
+        </div>
+        <button type="button" class="lightbox-nav lightbox-next" onclick="event.stopPropagation(); showNextGalleryImage()" aria-label="Ảnh tiếp theo">›</button>
     </div>
 
     <header class="app-header">
@@ -1600,7 +1732,7 @@
 
                     <div style="margin-top: 20px; border-top: 1px dashed #cbd5e1; padding-top: 14px; display: flex; flex-direction: column; gap: 8px;">
                         <button class="btn-secondary" style="font-size:0.82rem; width:100%;" onclick="window.print()">🖨️ In Báo Cáo / Lưu PDF</button>
-                        <button class="btn-secondary" style="font-size:0.82rem; width:100%;" onclick="showLogin()">↩️ Đăng Xuất</button>
+                        <button class="btn-secondary" style="font-size:0.82rem; width:100%;" onclick="logout()">↩️ Đăng Xuất</button>
                     </div>
                 </div>
 
@@ -2230,10 +2362,35 @@
 
         function showLogin() {
             populateDropdowns();
+
+            // Đóng các lớp giao diện mobile trước khi quay về màn hình đăng nhập.
+            if (typeof closeMobileMenu === 'function') {
+                closeMobileMenu();
+            }
+
+            const lightbox = document.getElementById('image-lightbox');
+            if (lightbox) lightbox.classList.add('hidden');
+
             document.getElementById('login-view').classList.remove('hidden');
             document.getElementById('report-view').classList.add('hidden');
             document.getElementById('admin-view').classList.add('hidden');
             document.getElementById('login-error').style.display = 'none';
+
+            // Xóa phiên học sinh hiện tại để Firebase listener không render lại report.
+            currentStudent = null;
+            currentStudentTab = 'overview';
+
+            // Reset ô tên để lần đăng nhập sau bắt đầu sạch.
+            const nameInput = document.getElementById('student-name-input');
+            if (nameInput) nameInput.value = '';
+
+            // Đưa trang về đầu màn hình.
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        }
+
+        function logout() {
+            // Đăng xuất học sinh: luôn quay về đúng màn hình đăng nhập.
+            showLogin();
         }
 
         function showReport() {
@@ -2489,14 +2646,101 @@
             renderStudentReport();
         }
 
-        function openLightbox(imgUrl) {
-            document.getElementById('lightbox-img').src = imgUrl;
+        let activeGalleryImages = [];
+        let activeGalleryIndex = 0;
+        let galleryTouchStartX = 0;
+        let galleryTouchStartY = 0;
+
+        function openGalleryViewer(images, index = 0) {
+            activeGalleryImages = Array.isArray(images) ? images.filter(Boolean) : [];
+            activeGalleryIndex = Math.max(0, Math.min(Number(index) || 0, activeGalleryImages.length - 1));
+
+            if (!activeGalleryImages.length) return;
+
             document.getElementById('image-lightbox').classList.remove('hidden');
+            updateGalleryViewer();
+
+            document.body.classList.add('lightbox-open');
+        }
+
+        // Backward-compatible helper for any existing image that still calls openLightbox().
+        function openLightbox(imgUrl) {
+            openGalleryViewer([imgUrl], 0);
+        }
+
+        function updateGalleryViewer() {
+            const img = document.getElementById('lightbox-img');
+            const counter = document.getElementById('lightbox-counter');
+            const prev = document.querySelector('.lightbox-prev');
+            const next = document.querySelector('.lightbox-next');
+
+            if (!img || !activeGalleryImages.length) return;
+
+            img.src = activeGalleryImages[activeGalleryIndex];
+
+            if (counter) {
+                counter.textContent = `${activeGalleryIndex + 1} / ${activeGalleryImages.length}`;
+            }
+
+            const multiple = activeGalleryImages.length > 1;
+            if (prev) prev.style.display = multiple ? 'grid' : 'none';
+            if (next) next.style.display = multiple ? 'grid' : 'none';
+            if (counter) counter.style.display = multiple ? 'block' : 'none';
+        }
+
+        function showNextGalleryImage() {
+            if (activeGalleryImages.length < 2) return;
+            activeGalleryIndex = (activeGalleryIndex + 1) % activeGalleryImages.length;
+            updateGalleryViewer();
+        }
+
+        function showPreviousGalleryImage() {
+            if (activeGalleryImages.length < 2) return;
+            activeGalleryIndex = (activeGalleryIndex - 1 + activeGalleryImages.length) % activeGalleryImages.length;
+            updateGalleryViewer();
         }
 
         function closeLightbox() {
             document.getElementById('image-lightbox').classList.add('hidden');
+            document.body.classList.remove('lightbox-open');
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const lightbox = document.getElementById('image-lightbox');
+            if (!lightbox) return;
+
+            lightbox.addEventListener('touchstart', (event) => {
+                if (!event.changedTouches.length) return;
+                galleryTouchStartX = event.changedTouches[0].clientX;
+                galleryTouchStartY = event.changedTouches[0].clientY;
+            }, { passive: true });
+
+            lightbox.addEventListener('touchend', (event) => {
+                if (!event.changedTouches.length || activeGalleryImages.length < 2) return;
+
+                const endX = event.changedTouches[0].clientX;
+                const endY = event.changedTouches[0].clientY;
+                const dx = endX - galleryTouchStartX;
+                const dy = endY - galleryTouchStartY;
+
+                // Chỉ coi là vuốt ảnh khi chuyển động ngang đủ lớn và không phải cuộn dọc.
+                if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.25) {
+                    if (dx < 0) {
+                        showNextGalleryImage();      // Vuốt trái → ảnh tiếp theo
+                    } else {
+                        showPreviousGalleryImage();  // Vuốt phải → ảnh trước
+                    }
+                }
+            }, { passive: true });
+
+            document.addEventListener('keydown', (event) => {
+                if (lightbox.classList.contains('hidden')) return;
+
+                if (event.key === 'ArrowRight') showNextGalleryImage();
+                if (event.key === 'ArrowLeft') showPreviousGalleryImage();
+                if (event.key === 'Escape') closeLightbox();
+            });
+        });
 
         function switchStudentTab(tabName) {
             currentStudentTab = tabName;
@@ -2603,7 +2847,7 @@
                     allImgsHtml += `<div style="margin-bottom:12px;"><b style="font-size:0.85rem; color:#0284c7;">📅 Ngày ${formatDateVN(dateStr)}:</b>`;
                     allImgsHtml += `<div class="activity-gallery-grid">` + imgs.map(url => `
                         <div class="activity-thumb-wrap">
-                            <img src="${url}" class="activity-thumb" onclick="openLightbox('${url}')" title="Bấm xem lớn">
+                            <img src="${url}" class="activity-thumb" onclick='openGalleryViewer(${JSON.stringify(imgs)}, ${imgs.indexOf(url)})' title="Bấm xem lớn — có thể lướt để xem ảnh tiếp theo">
                         </div>
                     `).join('') + `</div></div>`;
                 }
