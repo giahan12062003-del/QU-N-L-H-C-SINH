@@ -96,11 +96,13 @@
         .date-selector-box label { font-size: 0.82rem; font-weight: 700; color: #0369a1; }
         .date-input { border: none; outline: none; background: transparent; font-size: 0.9rem; font-weight: 700; color: #1e293b; cursor: pointer; }
 
-        /* Lesson Details Grid */
+        /* Lesson Details Grid & Overview Grid */
         .lesson-detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
         .lesson-card-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
-        .lesson-card-box h4 { font-size: 0.85rem; color: #64748b; margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
-        .lesson-card-box p { font-size: 1.05rem; font-weight: 700; color: #1e293b; }
+        .lesson-card-box h4 { font-size: 0.82rem; color: #64748b; margin-bottom: 6px; text-transform: uppercase; font-weight: 700; }
+        .lesson-card-box p { font-size: 1rem; font-weight: 700; color: #1e293b; }
+
+        .overview-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
 
         .grid-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
         .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 18px; box-shadow: var(--shadow-soft); border: 1px solid #e2e8f0; }
@@ -155,7 +157,7 @@
         #image-lightbox.hidden { display: none !important; }
 
         .hidden { display: none !important; }
-        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } .grid-cards { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .dashboard-container { grid-template-columns: 1fr; } .grid-cards { grid-template-columns: 1fr; } .overview-grid-4 { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -207,7 +209,7 @@
             </div>
         </section>
 
-        <!-- 2. MÀN HÌNH XEM BÁO CÁO HỌC SINH (GIAO DIỆN SIDEBAR MỚI) -->
+        <!-- 2. MÀN HÌNH XEM BÁO CÁO HỌC SINH -->
         <main id="report-view" class="hidden">
             <div class="dashboard-container">
                 <!-- SIDEBAR MENU BÊN TRÁI -->
@@ -249,14 +251,22 @@
 
                         <!-- TAB CONTENT: 1. TỔNG QUAN -->
                         <div id="student-tab-overview" class="student-sub-tab">
-                            <div class="lesson-detail-grid">
+                            <div class="overview-grid-4">
                                 <div class="lesson-card-box" style="background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);">
                                     <h4>Trạng thái học tập</h4>
-                                    <p style="color: #0284c7;">Đang theo học đều đặn & chuyên cần</p>
+                                    <p style="color: #0284c7; font-size:0.95rem;">Đang theo học đều đặn</p>
                                 </div>
                                 <div class="lesson-card-box" style="background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);">
                                     <h4>Điểm trung bình gần nhất</h4>
                                     <p id="overview-avg-score" style="color: #ca8a04;">- / 10</p>
+                                </div>
+                                <div class="lesson-card-box" style="background: linear-gradient(135deg, #dcfce7 0%, #f0fdf4 100%);">
+                                    <h4>Tình hình chuyên cần</h4>
+                                    <p id="overview-attendance-status" style="color: #15803d;">Đang cập nhật...</p>
+                                </div>
+                                <div class="lesson-card-box" style="background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);">
+                                    <h4>Bài tập về nhà</h4>
+                                    <p id="overview-homework-status" style="color: #7e22ce;">Đang cập nhật...</p>
                                 </div>
                             </div>
                             <div class="card" style="border-left: 5px solid var(--pastel-blue-dark);">
@@ -267,7 +277,7 @@
                             </div>
                         </div>
 
-                        <!-- TAB CONTENT: 2. LỊCH SỬ HỌC TẬP (ĐIỂM DANH) -->
+                        <!-- TAB CONTENT: 2. LỊCH SỬ HỌC TẬP -->
                         <div id="student-tab-attendance" class="student-sub-tab hidden">
                             <h4 style="margin-bottom: 12px; color: #334155;">🗓️ Bảng Điểm Danh & Chuyên Cần Trong Tháng</h4>
                             <div class="table-wrapper">
@@ -432,7 +442,7 @@
                     </div>
                 </div>
 
-                <!-- TAB 1: ĐIỂM DANH, BÀI HỌC & UPLOAD ẢNH THEO LỊCH CỤ THỂ -->
+                <!-- TAB 1: ĐIỂM DANH, BÀI HỌC & UPLOAD ẢNH -->
                 <div id="admin-tab-att">
                     <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0;">
                         <div style="display: flex; align-items: center; gap: 10px;">
@@ -445,7 +455,7 @@
                         </div>
                     </div>
 
-                    <!-- KHUNG NHẬP BÀI HỌC TRONG NGÀY (CHỦ ĐỀ, TỪ VỰNG, NGỮ PHÁP, HOẠT ĐỘNG) -->
+                    <!-- KHUNG NHẬP BÀI HỌC TRONG NGÀY -->
                     <div class="card" style="margin-bottom: 20px; border-left: 5px solid #0284c7; background: #f8fafc;">
                         <h3 style="margin-bottom: 12px; color: #0369a1; font-size: 1rem;">📖 Cập Nhật Bài Học Trong Ngày (<span id="admin-selected-date-label">--/--/----</span>)</h3>
                         <div class="form-grid">
@@ -931,7 +941,23 @@
             const classDates = getClassDates(currentStudent.className);
             const monthDates = classDates.filter(d => d.startsWith(selectedStudentMonth));
 
-            // 1. Attendance Table
+            let presentCount = 0;
+            let hwCompleteCount = 0;
+            monthDates.forEach(dateStr => {
+                const rec = (currentStudent.attendanceByDate && currentStudent.attendanceByDate[dateStr]) || { att: "Có mặt", hw: "Hoàn thành" };
+                if (rec.att === "Có mặt" || rec.att === "Đi trễ") presentCount++;
+                if (rec.hw === "Hoàn thành" || rec.hw === "Nộp trễ") hwCompleteCount++;
+            });
+
+            const totalMonthClasses = monthDates.length;
+            if (totalMonthClasses > 0) {
+                document.getElementById('overview-attendance-status').innerText = `Có mặt ${presentCount}/${totalMonthClasses} buổi`;
+                document.getElementById('overview-homework-status').innerText = `Hoàn thành ${hwCompleteCount}/${totalMonthClasses} bài`;
+            } else {
+                document.getElementById('overview-attendance-status').innerText = `Chưa có lịch tháng này`;
+                document.getElementById('overview-homework-status').innerText = `Chưa có bài tập`;
+            }
+
             const attTbody = document.getElementById('report-attendance-tbody');
             if (monthDates.length === 0) {
                 attTbody.innerHTML = `<tr><td colspan="4"><i>Không có lịch học nào trong tháng này!</i></td></tr>`;
@@ -949,7 +975,6 @@
                 }).join('');
             }
 
-            // 2. Homework Table
             const hwTbody = document.getElementById('report-homework-tbody');
             if (monthDates.length === 0) {
                 hwTbody.innerHTML = `<tr><td colspan="3"><i>Không có dữ liệu bài tập.</i></td></tr>`;
@@ -966,7 +991,6 @@
                 }).join('');
             }
 
-            // 3. Lesson Tab Setup
             const lessonSelectorContainer = document.getElementById('lesson-date-selector-container');
             if (monthDates.length > 0) {
                 if (!monthDates.includes(studentSelectedLessonDate)) {
@@ -983,7 +1007,6 @@
             }
             renderStudentLessonContent();
 
-            // 4. Gallery Tab Setup
             const galleryContainer = document.getElementById('student-gallery-container');
             let allImgsHtml = '';
             monthDates.forEach(dateStr => {
@@ -999,7 +1022,6 @@
             });
             galleryContainer.innerHTML = allImgsHtml || '<i>Chưa có hình ảnh hoạt động nào trong tháng này.</i>';
 
-            // 5. Scores & Comments
             const reports = currentStudent.examReports || [];
             const selectorContainer = document.getElementById('student-exam-selector-box');
             
@@ -1082,7 +1104,6 @@
             document.getElementById('admin-tab-students').classList.toggle('hidden', tab !== 'students');
         }
 
-        // TAB 1: ĐIỂM DANH & CHỌN ẢNH TRỰC TIẾP TỪ MÁY (ADMIN)
         function renderAdminAttTable() {
             const currentClass = document.getElementById('admin-class-filter').value;
             const filteredStudents = studentsData.filter(s => s.className === currentClass);
@@ -1095,7 +1116,6 @@
                     <th style="background: ${dateStr === activeDate ? '#e0f2fe' : '#f8fafc'};">
                         <div style="cursor: pointer; color: #0284c7; font-weight: 700; margin-bottom: 6px;" title="Xóa ngày học này" onclick="deleteOrEditDate('${currentClass}', ${idx})">📅 ${formatDateVN(dateStr)} <span style="font-size: 0.7rem; color: #ef4444;">(Xóa)</span></div>
                         <div style="margin-top: 6px;">
-                            <!-- DÙNG FILE INPUT ĐỂ CHỌN ẢNH TRỰC TIẾP TỪ MÁY -->
                             <input type="file" id="img-file-input-${currentClass}-${dateStr}" accept="image/*" class="form-control" style="font-size:0.75rem; padding:3px; margin-bottom:4px; background:#fff;">
                             <button class="btn-success" style="padding:4px 8px; font-size:0.75rem;" onclick="uploadAndAddClassImage('${currentClass}', '${dateStr}')">📤 Tải Ảnh Lên</button>
                         </div>
@@ -1150,7 +1170,6 @@
             `).join('');
         }
 
-        // HÀM XỬ LÝ CHỌN ẢNH TỪ MÁY VÀ ĐỔI SANG BASE64 ĐỂ LƯU THẲNG LÊN FIREBASE
         function uploadAndAddClassImage(className, dateStr) {
             const fileInputId = `img-file-input-${className}-${dateStr}`;
             const fileInput = document.getElementById(fileInputId);
@@ -1171,7 +1190,7 @@
 
                 classImagesMap[className][dateStr].push(base64Image);
                 saveData();
-                fileInput.value = ''; // Reset input
+                fileInput.value = '';
                 renderAdminAttTable();
                 alert("Đã tải ảnh lên và lưu thành công! 🎉");
             };
@@ -1248,7 +1267,6 @@
             }
         }
 
-        // TAB 2: QUẢN LÝ ĐIỂM
         function renderAdminScoresTable() {
             const currentClass = document.getElementById('admin-class-filter').value;
             const filteredStudents = studentsData.filter(s => s.className === currentClass);
@@ -1451,7 +1469,6 @@
             document.getElementById('form-title').innerText = "✏️ Cập Nhật Điểm Kiểm Tra & Nhận Xét";
         }
 
-        // TAB 3: QUẢN LÝ LỚP & HỌC SINH
         function renderClassManageTable() {
             const tbody = document.getElementById('class-manage-tbody');
             if (classList.length === 0) {
